@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: ClickUp API Documentation
+    url: https://developer.clickup.com/docs/
+    about: Official ClickUp API documentation
+  - name: Discussions
+    url: https://github.com/Kendew-Agency/clickup-sdk/discussions
+    about: Ask questions and discuss ideas with the community

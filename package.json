@@ -1,0 +1,54 @@
+{
+	"name": "@kendew-agency/clickup-sdk",
+	"version": "0.1.0",
+	"description": "Node.js library for the ClickUp API",
+	"main": "./dist/index.js",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		},
+		"./types": {
+			"types": "./dist/types/index.d.ts",
+			"import": "./dist/types/index.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "tsc",
+		"clean": "rm -rf dist",
+		"prebuild": "pnpm clean",
+		"prepublishOnly": "pnpm build",
+		"test": "vitest run",
+		"test:watch": "vitest",
+		"test:ui": "vitest --ui",
+		"test:coverage": "vitest run --coverage"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Kendew-Agency/clickup-sdk.git"
+	},
+	"keywords": [
+		"ClickUp",
+		"Node.js",
+		"SDK"
+	],
+	"author": "Kendew Agency",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/Kendew-Agency/clickup-sdk/issues"
+	},
+	"homepage": "https://github.com/Kendew-Agency/clickup-sdk#readme",
+	"devDependencies": {
+		"@biomejs/biome": "2.3.14",
+		"@types/node": "^25.2.3",
+		"@vitest/ui": "^4.0.18",
+		"fast-check": "^4.5.3",
+		"typescript": "^5.9.3",
+		"vitest": "^4.0.18"
+	}
+}
