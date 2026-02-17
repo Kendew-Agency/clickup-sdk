@@ -14,6 +14,10 @@ type Target = {
   current: number;
   unit: string | null;
   currency: string | null;
+  /**
+   * Not shown in docs but present in api response
+   */
+  percent_completed: number;
   owners: GoalOwner[];
   last_action: {
     id: string;
