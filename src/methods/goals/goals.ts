@@ -17,7 +17,7 @@ export class Goals extends Base {
    * @returns A list of goals in the workspace
    * @see https://developer.clickup.com/reference/getgoals
    */
-  public async getGoals(team_id: string) {
+  public async getGoals(team_id: number) {
     return this.request<GetGoalsResponse>(`/team/${team_id}/goal`, {
       method: "GET",
     });
@@ -46,7 +46,7 @@ export class Goals extends Base {
    * @returns Created goal details
    * @see https://developer.clickup.com/reference/creategoal
    */
-  public async createGoal(team_id: string, params: CreateGoalParams) {
+  public async createGoal(team_id: number, params: CreateGoalParams) {
     return this.request<CreateGoalResponse>(`/team/${team_id}/goal`, {
       method: "POST",
       body: {
