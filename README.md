@@ -366,13 +366,13 @@ await clickup.lists.deleteList("list_id");
 
 ```typescript
 // Get goals in a workspace
-const goals = await clickup.goals.getGoals("workspace_id");
+const goals = await clickup.goals.getGoals(123456);
 
 // Get a single goal
 const goal = await clickup.goals.getGoal("goal_id");
 
 // Create a goal
-const newGoal = await clickup.goals.createGoal("workspace_id", {
+const newGoal = await clickup.goals.createGoal(123456, {
   name: "Q1 Goals",
   due_date: 1609459200000,
   description: "First quarter objectives",
