@@ -59,8 +59,8 @@ export abstract class Base {
   ): Record<string, string> {
     const headers: Record<string, string> = {};
 
-    // 1. Start with Authorization header using Bearer token
-    headers.Authorization = `Bearer ${this.config.apiToken}`;
+    // 1. Start with Authorization header
+    headers.Authorization = `${this.config.apiToken}`;
 
     // 2. Add Content-Type when body is present
     if (hasBody) {

@@ -98,12 +98,12 @@ describe("Base class - URL construction", () => {
 
 describe("Base class - Header construction", () => {
   describe("buildHeaders", () => {
-    it("should include Authorization header with Bearer token", () => {
+    it("should include Authorization header token", () => {
       const config: ClickUpConfig = { apiToken: "test_token_123" };
       const testBase = new TestBase(config);
       const headers = testBase.testBuildHeaders(false);
 
-      expect(headers.Authorization).toBe("Bearer test_token_123");
+      expect(headers.Authorization).toBe("test_token_123");
     });
 
     it("should include Content-Type when body is present", () => {
@@ -157,7 +157,7 @@ describe("Base class - Header construction", () => {
       const testBase = new TestBase(config);
       const headers = testBase.testBuildHeaders(false);
 
-      expect(headers.Authorization).toBe("Bearer test_token_123");
+      expect(headers.Authorization).toBe("test_token_123");
       expect(headers["X-Custom-Header"]).toBe("custom-value");
     });
 
@@ -166,13 +166,13 @@ describe("Base class - Header construction", () => {
         apiToken: "test_token_123",
         headers: {
           // biome-ignore lint/style/useNamingConvention: Testing Authorization header override protection
-          Authorization: "Bearer malicious_token",
+          Authorization: "malicious_token",
         },
       };
       const testBase = new TestBase(config);
       const headers = testBase.testBuildHeaders(false);
 
-      expect(headers.Authorization).toBe("Bearer test_token_123");
+      expect(headers.Authorization).toBe("test_token_123");
     });
 
     it("should not allow request headers to override Authorization", () => {
@@ -180,10 +180,10 @@ describe("Base class - Header construction", () => {
       const testBase = new TestBase(config);
       const headers = testBase.testBuildHeaders(false, {
         // biome-ignore lint/style/useNamingConvention: Testing Authorization header override protection
-        Authorization: "Bearer malicious_token",
+        Authorization: "malicious_token",
       });
 
-      expect(headers.Authorization).toBe("Bearer test_token_123");
+      expect(headers.Authorization).toBe("test_token_123");
     });
 
     it("should prioritize request headers over config headers", () => {
