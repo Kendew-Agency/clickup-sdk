@@ -93,6 +93,74 @@ describe("Base class - URL construction", () => {
       expect(url).toContain("archived=false");
       expect(url).toContain("limit=50");
     });
+
+    it("should serialize array parameters with bracket notation", () => {
+      const url = testBase.testBuildUrl("/tasks", {
+        tags: ["urgent", "bug"],
+      });
+      expect(url).toContain("tags%5B%5D=urgent"); // %5B%5D is URL encoded []
+      expect(url).toContain("tags%5B%5D=bug");
+    });
+
+    it("should serialize multiple array parameters", () => {
+      const url = testBase.testBuildUrl("/tasks", {
+        statuses: ["open", "in progress"],
+        assignees: [123, 456],
+      });
+      expect(url).toContain("statuses%5B%5D=open");
+      expect(url).toContain("statuses%5B%5D=in+progress");
+      expect(url).toContain("assignees%5B%5D=123");
+      expect(url).toContain("assignees%5B%5D=456");
+    });
+
+    it("should handle empty arrays by omitting them", () => {
+      const url = testBase.testBuildUrl("/tasks", {
+        page: 1,
+        tags: [],
+      });
+      expect(url).toBe("https://api.clickup.com/api/v2/tasks?page=1");
+      expect(url).not.toContain("tags");
+    });
+
+    it("should skip null and undefined elements in arrays", () => {
+      const url = testBase.testBuildUrl("/tasks", {
+        assignees: [123, null, 456, undefined, 789],
+      });
+      expect(url).toContain("assignees%5B%5D=123");
+      expect(url).toContain("assignees%5B%5D=456");
+      expect(url).toContain("assignees%5B%5D=789");
+      // Count occurrences - should be exactly 3
+      const matches = url.match(/assignees%5B%5D=/g);
+      expect(matches).toHaveLength(3);
+    });
+
+    it("should handle single-element arrays with bracket notation", () => {
+      const url = testBase.testBuildUrl("/tasks", {
+        tags: ["urgent"],
+      });
+      expect(url).toContain("tags%5B%5D=urgent");
+    });
+
+    it("should handle mixed array and non-array parameters", () => {
+      const url = testBase.testBuildUrl("/tasks", {
+        page: 1,
+        archived: false,
+        tags: ["urgent", "bug"],
+      });
+      expect(url).toContain("page=1");
+      expect(url).toContain("archived=false");
+      expect(url).toContain("tags%5B%5D=urgent");
+      expect(url).toContain("tags%5B%5D=bug");
+    });
+
+    it("should handle array of numbers", () => {
+      const url = testBase.testBuildUrl("/tasks", {
+        custom_items: [0, 1, 1008],
+      });
+      expect(url).toContain("custom_items%5B%5D=0");
+      expect(url).toContain("custom_items%5B%5D=1");
+      expect(url).toContain("custom_items%5B%5D=1008");
+    });
   });
 });
 

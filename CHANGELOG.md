@@ -85,3 +85,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Changed team_id to number instead of string
 
 [0.2.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.0
+
+## [0.2.1] - 2026-02-18
+
+### Changed
+
+- build of the query fetch url has been changed
+
+[0.2.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.1
