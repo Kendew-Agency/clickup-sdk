@@ -7,9 +7,10 @@ type TaskUser = Pick<
 >;
 
 // Task structure
-type Task = {
+export type Task = {
   id: string;
   custom_id: string | null;
+  custom_item_id: number | null;
   name: string;
   text_content: string;
   description: string;
