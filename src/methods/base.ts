@@ -36,9 +36,28 @@ export abstract class Base {
 
     const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(query)) {
-      if (value !== undefined && value !== null) {
-        searchParams.append(key, String(value));
+      if (value === undefined || value === null) {
+        continue;
       }
+
+      // Handle array parameters with bracket notation
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          if (item !== undefined && item !== null) {
+            searchParams.append(`${key}[]`, String(item));
+          }
+        }
+        continue;
+      }
+
+      // Handle nested objects (stringify JSON)
+      if (typeof value === "object") {
+        searchParams.set(key, JSON.stringify(value));
+        continue;
+      }
+
+      // Handle primitives
+      searchParams.set(key, String(value));
     }
 
     const queryString = searchParams.toString();

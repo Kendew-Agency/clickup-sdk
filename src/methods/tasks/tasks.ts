@@ -44,6 +44,7 @@ export class Tasks extends Base {
         date_updated_gt: params?.date_updated_gt,
         date_updated_lt: params?.date_updated_lt,
         custom_fields: params?.custom_fields,
+        custom_items: params?.custom_items,
       },
     });
   }
