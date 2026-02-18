@@ -72,3 +72,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Development setup instructions
 
 [0.1.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.1.0
+
+## [0.2.0] - 2026-02-18
+
+### Changed
+
+- team_id is now typed is number instead of string
+- `Bearer` has ben removed from the default authorization header
+
+### Documentation
+
+- Changed team_id to number instead of string
+
+[0.2.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.0
