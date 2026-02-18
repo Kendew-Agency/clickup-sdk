@@ -1,6 +1,6 @@
 {
 	"name": "@kendew-agency/clickup-sdk",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "Node.js library for the ClickUp API",
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",
