@@ -138,7 +138,7 @@ export type CreateTaskParams = {
   parent?: string;
   links_to?: string;
   check_required_custom_fields?: boolean;
-  markdown_description?: string;
+  markdown_content?: string;
   custom_fields?: {
     id: string;
     value: string | number | boolean | null;

@@ -81,26 +81,7 @@ export class Tasks extends Base {
   public async createTask(list_id: string, params: CreateTaskParams) {
     return this.request<CreateTaskResponse>(`/list/${list_id}/task`, {
       method: "POST",
-      body: {
-        name: params.name,
-        description: params.description,
-        assignees: params.assignees,
-        tags: params.tags,
-        status: params.status,
-        priority: params.priority,
-        due_date: params.due_date,
-        due_date_time: params.due_date_time,
-        time_estimate: params.time_estimate,
-        start_date: params.start_date,
-        start_date_time: params.start_date_time,
-        notify_all: params.notify_all,
-        parent: params.parent,
-        links_to: params.links_to,
-        check_required_custom_fields: params.check_required_custom_fields,
-        custom_fields: params.custom_fields,
-        archived: params.archived,
-        markdown_description: params.markdown_description,
-      },
+      body: params,
     });
   }
 

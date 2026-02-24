@@ -101,3 +101,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `markdown_description` is now added to the createTask interface
 
 [0.2.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.1
+
+## [0.2.3] - 2026-02-24
+
+### Fixed
+
+- `markdown_description` is now renamed to `markdown_content`
+
+[0.2.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.1
