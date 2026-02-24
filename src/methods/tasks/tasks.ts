@@ -98,6 +98,8 @@ export class Tasks extends Base {
         links_to: params.links_to,
         check_required_custom_fields: params.check_required_custom_fields,
         custom_fields: params.custom_fields,
+        archived: params.archived,
+        markdown_description: params.markdown_description,
       },
     });
   }

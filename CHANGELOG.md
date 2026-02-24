@@ -93,3 +93,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - build of the query fetch url has been changed
 
 [0.2.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.1
+
+## [0.2.2] - 2026-02-24
+
+### Changed
+
+- `markdown_description` is now added to the createTask interface
+
+[0.2.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.1
