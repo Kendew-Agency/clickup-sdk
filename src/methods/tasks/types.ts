@@ -119,10 +119,12 @@ export type GetTaskParams = ReferenceByCustomTaskId & {
 export type GetTaskResponse = Task;
 
 // Create task
-export type CreateTaskParams = ReferenceByCustomTaskId & {
+export type CreateTaskParams = {
   name: string;
   description?: string;
   assignees?: number[];
+  archived?: boolean;
+  group_assignees?: number[];
   tags?: string[];
   status?: string;
   priority?: number;
@@ -131,16 +133,17 @@ export type CreateTaskParams = ReferenceByCustomTaskId & {
   time_estimate?: number;
   start_date?: number;
   start_date_time?: boolean;
+  points?: number;
   notify_all?: boolean;
   parent?: string;
   links_to?: string;
   check_required_custom_fields?: boolean;
+  markdown_description?: string;
   custom_fields?: {
     id: string;
     value: string | number | boolean | null;
   }[];
   custom_item_id?: number;
-  group_assignees?: number[];
 };
 
 export type CreateTaskResponse = Task;

@@ -23,6 +23,7 @@ export abstract class Base {
    * @param query - Optional query parameters to append to the URL
    * @returns The complete URL string
    */
+  // biome-ignore lint/complexity/noExcessiveCognitiveComplexity: ClickUp complex url structure does not allow for low complexity
   private buildUrl(endpoint: string, query?: Record<string, unknown>): string {
     const baseUrl = "https://api.clickup.com/api/v2";
     const normalizedEndpoint = endpoint.startsWith("/")

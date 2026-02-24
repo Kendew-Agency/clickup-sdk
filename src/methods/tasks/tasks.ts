@@ -99,10 +99,6 @@ export class Tasks extends Base {
         check_required_custom_fields: params.check_required_custom_fields,
         custom_fields: params.custom_fields,
       },
-      query: {
-        custom_task_ids: params.custom_task_ids,
-        team_id: params.team_id,
-      },
     });
   }
 
