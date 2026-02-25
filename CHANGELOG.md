@@ -122,3 +122,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `createTaskAttachment` now correctly handles file uploads with proper FormData construction
 
 [0.3.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.3.0
+
+## [0.3.1] - 2026-02-25
+
+### Fixed
+
+- Fetch headers now handle formdata properly
+
+[0.3.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.3.1
