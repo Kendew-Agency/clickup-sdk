@@ -2,7 +2,6 @@ export type CreateTaskAttachemntParams = CreateTaskAttachemntParamsBase &
   CreateTaskAttachemntParamsConditional;
 
 type CreateTaskAttachemntParamsBase = {
-  task_id: string;
   /**
    * The attachment to upload.
    * @description this differs from the documentation. Yet attachment `array` is not the correct type.

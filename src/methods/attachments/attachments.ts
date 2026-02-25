@@ -12,7 +12,10 @@ export class Attachments extends Base {
    * @returns the file stored in ClickUp or an error
    * @see https://developer.clickup.com/reference/createtaskattachment
    */
-  public async createTaskAttachement(params: CreateTaskAttachemntParams) {
+  public async createTaskAttachment(
+    task_id: string,
+    params: CreateTaskAttachemntParams,
+  ) {
     // Clicup expects a multipart/form-data request
 
     // Create new formdata
@@ -23,9 +26,10 @@ export class Attachments extends Base {
     formData.append(`attachment`, params.attachment, sanitizedFileName);
 
     return this.request<CreateTaskAttachemntResponse>(
-      `/task/${params.task_id}/attachment`,
+      `/task/${task_id}/attachment`,
       {
         method: "POST",
+        body: formData,
         query: {
           custom_task_ids: params.custom_task_ids,
           team_id: params.team_id,

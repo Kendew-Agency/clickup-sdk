@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { Attachments } from "./attachments.js";
 import type { ClickUpConfig } from "../../types/config.types.js";
 
-describe("Attachments - createTaskAttachement", () => {
+describe("Attachments - createTaskAttachment", () => {
   const config: ClickUpConfig = { apiToken: "test_token_123" };
   const attachments = new Attachments(config);
 
@@ -22,8 +22,7 @@ describe("Attachments - createTaskAttachement", () => {
       type: "text/plain",
     });
 
-    await attachments.createTaskAttachement({
-      task_id: "task_123",
+    await attachments.createTaskAttachment("task_123", {
       attachment: mockFile,
     });
 
@@ -51,41 +50,11 @@ describe("Attachments - createTaskAttachement", () => {
       type: "text/plain",
     });
 
-    await attachments.createTaskAttachement({
-      task_id: "task_123",
+    await attachments.createTaskAttachment("task_123", {
       attachment: mockFile,
     });
 
     expect(capturedMethod).toBe("POST");
-  });
-
-  it("should not include request body (FormData bug in source)", async () => {
-    let capturedBody: string | undefined;
-    globalThis.fetch = async (
-      _url: RequestInfo | URL,
-      options?: RequestInit,
-    ) => {
-      capturedBody = options?.body as string | undefined;
-      return {
-        ok: true,
-        status: 200,
-        text: async () =>
-          JSON.stringify({ id: "attachment_123", url: "https://example.com" }),
-      } as Response;
-    };
-
-    const mockFile = new File(["test content"], "my test file.txt", {
-      type: "text/plain",
-    });
-
-    await attachments.createTaskAttachement({
-      task_id: "task_123",
-      attachment: mockFile,
-    });
-
-    // Note: The source code creates FormData but doesn't pass it to the request
-    // This is a bug - the FormData is created but never sent
-    expect(capturedBody).toBeUndefined();
   });
 
   it("should include custom_task_ids in query string when provided", async () => {
@@ -104,10 +73,10 @@ describe("Attachments - createTaskAttachement", () => {
       type: "text/plain",
     });
 
-    await attachments.createTaskAttachement({
-      task_id: "task_123",
+    await attachments.createTaskAttachment("task_123", {
       attachment: mockFile,
       custom_task_ids: true,
+      team_id: 123,
     });
 
     expect(capturedUrl).toContain("custom_task_ids=true");
@@ -129,13 +98,12 @@ describe("Attachments - createTaskAttachement", () => {
       type: "text/plain",
     });
 
-    await attachments.createTaskAttachement({
-      task_id: "task_123",
+    await attachments.createTaskAttachment("task_123", {
       attachment: mockFile,
-      team_id: "team_456",
+      team_id: 456,
     });
 
-    expect(capturedUrl).toContain("team_id=team_456");
+    expect(capturedUrl).toContain("team_id=456");
   });
 
   it("should include both custom_task_ids and team_id when provided", async () => {
@@ -154,15 +122,14 @@ describe("Attachments - createTaskAttachement", () => {
       type: "text/plain",
     });
 
-    await attachments.createTaskAttachement({
-      task_id: "task_123",
+    await attachments.createTaskAttachment("task_123", {
       attachment: mockFile,
       custom_task_ids: true,
-      team_id: "team_789",
+      team_id: 789,
     });
 
     expect(capturedUrl).toContain("custom_task_ids=true");
-    expect(capturedUrl).toContain("team_id=team_789");
+    expect(capturedUrl).toContain("team_id=789");
   });
 
   it("should handle successful response", async () => {
@@ -188,8 +155,7 @@ describe("Attachments - createTaskAttachement", () => {
       type: "text/plain",
     });
 
-    const result = await attachments.createTaskAttachement({
-      task_id: "task_123",
+    const result = await attachments.createTaskAttachment("task_123", {
       attachment: mockFile,
     });
 
@@ -210,8 +176,7 @@ describe("Attachments - createTaskAttachement", () => {
       type: "text/plain",
     });
 
-    const result = await attachments.createTaskAttachement({
-      task_id: "task_999",
+    const result = await attachments.createTaskAttachment("task_999", {
       attachment: mockFile,
     });
 
@@ -233,8 +198,7 @@ describe("Attachments - createTaskAttachement", () => {
       type: "text/plain",
     });
 
-    const result = await attachments.createTaskAttachement({
-      task_id: "task_123",
+    const result = await attachments.createTaskAttachment("task_123", {
       attachment: mockFile,
     });
 

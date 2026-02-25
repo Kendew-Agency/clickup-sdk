@@ -256,11 +256,10 @@ await clickup.comments.createListComment("list_id", {
 
 ```typescript
 // Upload task attachment
-const attachment = await clickup.attachments.uploadTaskAttachment(
+const attachment = await clickup.attachments.createTaskAttachment(
   "task_id",
   {
-    attachment: fileBuffer, // Buffer or File object
-    filename: "document.pdf",
+    attachment: newFile, // File object
   },
 );
 ```

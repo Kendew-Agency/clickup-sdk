@@ -1,9 +1,11 @@
 import type { ClickUpConfig } from "../types/config.types";
 import type { Response } from "../interfaces";
 
+type Body = Record<string, unknown> | FormData;
+
 type RequestOptions = {
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
-  body?: Record<string, unknown>;
+  body?: Body;
   query?: Record<string, unknown>;
   headers?: Record<string, string>;
 };
@@ -119,10 +121,7 @@ export abstract class Base {
    * @param body - Optional body data to serialize
    * @returns JSON string for methods that accept body, undefined otherwise
    */
-  private prepareRequestBody(
-    method: string,
-    body?: Record<string, unknown>,
-  ): string | undefined {
+  private prepareRequestBody(method: string, body?: Body): string | undefined {
     // GET and DELETE requests should not have a body
     if (method === "GET" || method === "DELETE") {
       return undefined;
