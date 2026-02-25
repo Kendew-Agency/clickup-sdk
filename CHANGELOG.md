@@ -115,5 +115,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - `createTaskAttachement` has been reworked for consitancy and functionality
+- `createTaskAttachement` has been renamed to `createTaskAttachment`
+
+### Fixed
+
+- `createTaskAttachment` now correctly handles file uploads with proper FormData construction
 
 [0.3.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.3.0

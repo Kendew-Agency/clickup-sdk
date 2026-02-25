@@ -256,7 +256,7 @@ await clickup.comments.createListComment("list_id", {
 
 ```typescript
 // Upload task attachment
-const attachment = await clickup.attachments.createTaskAttachement(
+const attachment = await clickup.attachments.createTaskAttachment(
   "task_id",
   {
     attachment: newFile, // File object
