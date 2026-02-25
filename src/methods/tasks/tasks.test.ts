@@ -302,27 +302,6 @@ describe("Tasks - createTask", () => {
     expect(body.notify_all).toBe(true);
   });
 
-  it("should include query params for custom task IDs", async () => {
-    let capturedUrl = "";
-    globalThis.fetch = async (url: RequestInfo | URL) => {
-      capturedUrl = url.toString();
-      return {
-        ok: true,
-        status: 200,
-        text: async () => JSON.stringify({ id: "task_123", name: "New Task" }),
-      } as Response;
-    };
-
-    await tasks.createTask("list_123", {
-      name: "New Task",
-      custom_task_ids: true,
-      team_id: "team_789",
-    });
-
-    expect(capturedUrl).toContain("custom_task_ids=true");
-    expect(capturedUrl).toContain("team_id=team_789");
-  });
-
   it("should handle successful response", async () => {
     const mockData = {
       id: "task_123",

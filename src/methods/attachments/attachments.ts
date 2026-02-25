@@ -12,7 +12,7 @@ export class Attachments extends Base {
    * @returns the file stored in ClickUp or an error
    * @see https://developer.clickup.com/reference/createtaskattachment
    */
-  public async createTaskAttachement(
+  public async createTaskAttachment(
     task_id: string,
     params: CreateTaskAttachemntParams,
   ) {
