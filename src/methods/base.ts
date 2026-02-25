@@ -71,12 +71,12 @@ export abstract class Base {
    * Builds request headers by merging authorization, content-type, config headers,
    * and request-specific headers with proper priority.
    *
-   * @param hasBody - Whether the request includes a body (for Content-Type header)
+   * @param body - The body of the request for content type handling
    * @param requestHeaders - Optional request-specific headers to merge
    * @returns Record of header key-value pairs with all values as strings
    */
   private buildHeaders(
-    hasBody: boolean,
+    body: unknown,
     requestHeaders?: Record<string, string>,
   ): Record<string, string> {
     const headers: Record<string, string> = {};
@@ -85,7 +85,13 @@ export abstract class Base {
     headers.Authorization = `${this.config.apiToken}`;
 
     // 2. Add Content-Type when body is present
-    if (hasBody) {
+    const isFormData =
+      typeof body === "object" &&
+      body !== null &&
+      typeof (body as FormData).append === "function" &&
+      body.constructor?.name === "FormData";
+
+    if (body && !isFormData) {
       headers["Content-Type"] = "application/json";
     }
 
@@ -121,10 +127,17 @@ export abstract class Base {
    * @param body - Optional body data to serialize
    * @returns JSON string for methods that accept body, undefined otherwise
    */
-  private prepareRequestBody(method: string, body?: Body): string | undefined {
+  private prepareRequestBody(
+    method: string,
+    body?: Body,
+  ): string | FormData | undefined {
     // GET and DELETE requests should not have a body
     if (method === "GET" || method === "DELETE") {
       return undefined;
+    }
+
+    if (body instanceof FormData) {
+      return body; // IMPORTANT: do NOT stringify
     }
 
     // POST, PUT, and PATCH requests serialize body to JSON
@@ -245,7 +258,7 @@ export abstract class Base {
    * - Query parameter encoding for GET requests
    * - Request body serialization for POST/PUT/PATCH (ignored for GET/DELETE)
    * - Header merging with proper priority (auth > config > request-specific)
-   * - Content-Type header automatically added when body is present
+   * - Content-Type is automatically added when body is JSON (not FormData)
    * - Consistent error handling with structured error responses
    * - JSON response parsing with empty body handling
    *
@@ -361,7 +374,7 @@ export abstract class Base {
     const requestBody = this.prepareRequestBody(method, body);
 
     // 5. Build headers with authentication
-    const headers = this.buildHeaders(!!requestBody, requestHeaders);
+    const headers = this.buildHeaders(requestBody, requestHeaders);
 
     try {
       // 6. Execute fetch with constructed parameters
