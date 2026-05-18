@@ -26,14 +26,17 @@ export class Comments extends Base {
    * @returns A list of 25 max comments on a task
    * @see https://developer.clickup.com/reference/gettaskcomments
    */
-  public async getTaskComments(task_id: string, params: GetTaskCommentsParams) {
+  public async getTaskComments(
+    task_id: string,
+    params?: GetTaskCommentsParams,
+  ) {
     return this.request<GetTaskCommentsResponse>(`/task/${task_id}/comment`, {
       method: "GET",
       query: {
-        custom_task_ids: params.custom_task_ids,
-        team_id: params.team_id,
-        start: params.start,
-        start_id: params.start_id,
+        custom_task_ids: params?.custom_task_ids,
+        team_id: params?.team_id,
+        start: params?.start,
+        start_id: params?.start_id,
       },
     });
   }
@@ -72,15 +75,15 @@ export class Comments extends Base {
    */
   public async getChatViewComments(
     view_id: string,
-    params: GetChatViewCommentsParams,
+    params?: GetChatViewCommentsParams,
   ) {
     return this.request<GetChatViewCommentsResponse>(
       `/view/${view_id}/comment`,
       {
         method: "GET",
         query: {
-          start: params.start,
-          start_id: params.start_id,
+          start: params?.start,
+          start_id: params?.start_id,
         },
       },
     );
@@ -115,12 +118,15 @@ export class Comments extends Base {
    * @returns A list of comments for a list
    * @see https://developer.clickup.com/reference/getlistcomments
    */
-  public async getListComments(list_id: string, params: GetListCommentsParams) {
+  public async getListComments(
+    list_id: string,
+    params?: GetListCommentsParams,
+  ) {
     return this.request<GetListCommentsResponse>(`/list/${list_id}/comment`, {
       method: "GET",
       query: {
-        start: params.start,
-        start_id: params.start_id,
+        start: params?.start,
+        start_id: params?.start_id,
       },
     });
   }
