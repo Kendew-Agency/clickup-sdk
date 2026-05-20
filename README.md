@@ -205,9 +205,7 @@ await clickup.tasks.deleteTaskLink("task_id", {
 
 ```typescript
 // Get task comments (paginated, max 25 per request)
-const comments = await clickup.comments.getTaskComments("task_id", {
-  start: 0,
-});
+const comments = await clickup.comments.getTaskComments("task_id");
 
 // Create task comment
 const comment = await clickup.comments.createTaskComment("task_id", {
@@ -232,9 +230,7 @@ await clickup.comments.createThreadedComment("comment_id", {
 });
 
 // Get chat view comments
-const chatComments = await clickup.comments.getChatViewComments("view_id", {
-  start: 0,
-});
+const chatComments = await clickup.comments.getChatViewComments("view_id");
 
 // Create chat view comment
 await clickup.comments.createChatViewComment("view_id", {
@@ -242,9 +238,7 @@ await clickup.comments.createChatViewComment("view_id", {
 });
 
 // Get list comments
-const listComments = await clickup.comments.getListComments("list_id", {
-  start: 0,
-});
+const listComments = await clickup.comments.getListComments("list_id");
 
 // Create list comment
 await clickup.comments.createListComment("list_id", {
