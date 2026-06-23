@@ -71,6 +71,10 @@ export type GetListResponse = List;
 export type CreateListParams = {
   name: string;
   content?: string;
+  /**
+   * Overrides the default content
+   */
+  markdown_content?: string;
   due_date?: number;
   due_date_time?: boolean;
   priority?: number;
@@ -84,6 +88,10 @@ export type CreateListResponse = List;
 export type CreateFolderlessListParams = {
   name: string;
   content?: string;
+  /**
+   * Overrides the default content
+   */
+  markdown_content?: string;
   due_date?: number;
   due_date_time?: boolean;
   priority?: number;
@@ -97,6 +105,10 @@ export type CreateFolderlessListResponse = List;
 export type UpdateListParams = {
   name?: string;
   content?: string;
+  /**
+   * Overrides the default content
+   */
+  markdown_content?: string;
   due_date?: number;
   due_date_time?: boolean;
   priority?: number;
