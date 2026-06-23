@@ -377,6 +377,32 @@ describe("Lists - createList", () => {
     expect(body.assignee).toBe(123);
   });
 
+  it("should include markdown_content in request body when provided", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "list_new" }),
+      } as Response;
+    };
+
+    await lists.createList("folder_123", {
+      name: "New List",
+      markdown_content: "# Hello\n\nThis is **markdown** content",
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.name).toBe("New List");
+    expect(body.markdown_content).toBe(
+      "# Hello\n\nThis is **markdown** content",
+    );
+  });
+
   it("should handle successful response", async () => {
     const mockData = {
       id: "list_new",
@@ -492,6 +518,32 @@ describe("Lists - createFolderlessList", () => {
     expect(body.content).toBe("No folder needed");
     expect(body.due_date).toBe(1704067200000);
     expect(body.status).toBe("active");
+  });
+
+  it("should include markdown_content in request body when provided", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "list_new" }),
+      } as Response;
+    };
+
+    await lists.createFolderlessList("space_456", {
+      name: "Folderless List",
+      markdown_content: "## Tasks\n\n- [ ] Item one\n- [ ] Item two",
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.name).toBe("Folderless List");
+    expect(body.markdown_content).toBe(
+      "## Tasks\n\n- [ ] Item one\n- [ ] Item two",
+    );
   });
 
   it("should handle successful response", async () => {
@@ -611,6 +663,30 @@ describe("Lists - updateList", () => {
     expect(body.content).toBe("Updated content");
     expect(body.priority).toBe(3);
     expect(body.unset_status).toBe(true);
+  });
+
+  it("should include markdown_content in request body when provided", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "list_123" }),
+      } as Response;
+    };
+
+    await lists.updateList("list_123", {
+      markdown_content: "# Updated\n\nNew **markdown** description",
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.markdown_content).toBe(
+      "# Updated\n\nNew **markdown** description",
+    );
   });
 
   it("should handle successful response", async () => {

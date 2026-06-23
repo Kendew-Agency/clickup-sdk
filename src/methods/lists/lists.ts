@@ -82,6 +82,7 @@ export class Lists extends Base {
       body: {
         name: params.name,
         content: params.content,
+        markdown_content: params.markdown_content,
         due_date: params.due_date,
         due_date_time: params.due_date_time,
         priority: params.priority,
@@ -111,6 +112,7 @@ export class Lists extends Base {
         body: {
           name: params.name,
           content: params.content,
+          markdown_content: params.markdown_content,
           due_date: params.due_date,
           due_date_time: params.due_date_time,
           priority: params.priority,
@@ -136,6 +138,7 @@ export class Lists extends Base {
       body: {
         name: params.name,
         content: params.content,
+        markdown_content: params.markdown_content,
         due_date: params.due_date,
         due_date_time: params.due_date_time,
         priority: params.priority,
