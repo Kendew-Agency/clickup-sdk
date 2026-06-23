@@ -130,3 +130,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Fetch headers now handle formdata properly
 
 [0.3.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.3.1
+
+## [0.4.0] - 2026-06-23
+
+### Fixed
+
+- List methods missing `markdown_content`
+
+### Added
+
+- `toUnixMillis` added as a utility to convert dates to unix time
+- `fromUnixMillis` added as a utility to convert unix time to a regular date
+
+[0.3.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.4.0
