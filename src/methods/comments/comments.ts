@@ -51,14 +51,18 @@ export class Comments extends Base {
     task_id: string,
     params: CreateTaskCommentParams,
   ) {
+    const body: CreateTaskCommentBody = {
+      ...("comment" in params && params.comment
+        ? { comment: params.comment }
+        : { comment_text: params.comment_text }),
+      assignee: params.assignee,
+      group_assignee: params.group_assignee,
+      notify_all: params.notify_all,
+    };
+
     return this.request<CreateTaskCommentResponse>(`/task/${task_id}/comment`, {
       method: "POST",
-      body: {
-        comment_text: params.comment_text,
-        assignee: params.assignee,
-        group_assignee: params.group_assignee,
-        notify_all: params.notify_all,
-      } satisfies CreateTaskCommentBody,
+      body,
       query: {
         custom_task_ids: params.custom_task_ids,
         team_id: params.team_id,
@@ -104,7 +108,9 @@ export class Comments extends Base {
       {
         method: "POST",
         body: {
-          comment_text: params.comment_text,
+          ...("comment" in params && params.comment
+            ? { comment: params.comment }
+            : { comment_text: params.comment_text }),
           notify_all: params.notify_all,
         },
       },
@@ -144,7 +150,11 @@ export class Comments extends Base {
     return this.request<CreateListCommentResponse>(`/list/${list_id}/comment`, {
       method: "POST",
       body: {
-        ...params,
+        ...("comment" in params && params.comment
+          ? { comment: params.comment }
+          : { comment_text: params.comment_text }),
+        assignee: params.assignee,
+        notify_all: params.notify_all,
       },
     });
   }
@@ -159,10 +169,18 @@ export class Comments extends Base {
     comment_id: string,
     params: Partial<UpdateCommentParams>,
   ) {
+    const { assignee, group_assignee, resolved, ...rest } = params;
     return this.request<void>(`/comment/${comment_id}`, {
       method: "PUT",
       body: {
-        ...params,
+        ...("comment" in rest && rest.comment
+          ? { comment: rest.comment }
+          : rest.comment_text !== undefined
+            ? { comment_text: rest.comment_text }
+            : {}),
+        ...(assignee !== undefined && { assignee }),
+        ...(group_assignee !== undefined && { group_assignee }),
+        ...(resolved !== undefined && { resolved }),
       },
     });
   }
@@ -210,7 +228,12 @@ export class Comments extends Base {
     return this.request<void>(`/comment/${comment_id}/reply`, {
       method: "POST",
       body: {
-        ...params,
+        ...("comment" in params && params.comment
+          ? { comment: params.comment }
+          : { comment_text: params.comment_text }),
+        assignee: params.assignee,
+        group_assignee: params.group_assignee,
+        notify_all: params.notify_all,
       },
     });
   }

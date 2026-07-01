@@ -207,15 +207,47 @@ await clickup.tasks.deleteTaskLink("task_id", {
 // Get task comments (paginated, max 25 per request)
 const comments = await clickup.comments.getTaskComments("task_id");
 
-// Create task comment
+// Create task comment (plain text)
 const comment = await clickup.comments.createTaskComment("task_id", {
   comment_text: "This is a comment",
   notify_all: true,
 });
 
+// Create task comment (rich formatting)
+await clickup.comments.createTaskComment("task_id", {
+  comment: [
+    { text: "Important: ", attributes: { bold: true } },
+    { text: "Check this ", attributes: {} },
+    { text: "link", attributes: { link: "https://clickup.com/docs" } },
+    { text: "\n", attributes: { list: { list: "bullet" } } },
+  ],
+  notify_all: true,
+});
+
+// Comment with emoji and user mention
+await clickup.comments.createTaskComment("task_id", {
+  comment: [
+    { text: "Great work " },
+    { text: "\u{1F44D}", type: "emoticon", emoticon: { code: "1f44d" } },
+    { text: " " },
+    { type: "tag", user: { id: 1234567 } },
+    { text: "\n" },
+  ],
+  notify_all: false,
+});
+
 // Update comment
 await clickup.comments.updateComment("comment_id", {
   comment_text: "Updated comment",
+});
+
+// Update comment (rich formatting)
+await clickup.comments.updateComment("comment_id", {
+  comment: [
+    { text: "Updated with " },
+    { text: "formatting", attributes: { italic: true } },
+    { text: "\n" },
+  ],
 });
 
 // Delete comment
@@ -227,6 +259,7 @@ const replies = await clickup.comments.getThreadedComments("comment_id");
 // Create threaded comment
 await clickup.comments.createThreadedComment("comment_id", {
   comment_text: "Reply to comment",
+  notify_all: false,
 });
 
 // Get chat view comments
@@ -235,6 +268,7 @@ const chatComments = await clickup.comments.getChatViewComments("view_id");
 // Create chat view comment
 await clickup.comments.createChatViewComment("view_id", {
   comment_text: "Chat message",
+  notify_all: true,
 });
 
 // Get list comments
@@ -243,7 +277,35 @@ const listComments = await clickup.comments.getListComments("list_id");
 // Create list comment
 await clickup.comments.createListComment("list_id", {
   comment_text: "List comment",
+  notify_all: true,
 });
+```
+
+#### Type Guards for Comment Elements
+
+When reading comments, use the exported type guards to narrow element types:
+
+```typescript
+import {
+  isEmoticonElement,
+  isTagElement,
+  isTextElement,
+} from "@kendew-agency/clickup-sdk";
+
+const result = await clickup.comments.getTaskComments("task_id");
+if (result.data) {
+  for (const comment of result.data.comments) {
+    for (const el of comment.comment) {
+      if (isEmoticonElement(el)) {
+        console.log("Emoji:", el.emoticon.code);
+      } else if (isTagElement(el)) {
+        console.log("Mentioned user:", el.user.id);
+      } else if (isTextElement(el)) {
+        console.log("Text:", el.text, el.attributes);
+      }
+    }
+  }
+}
 ```
 
 ### Attachments
@@ -480,6 +542,12 @@ import type {
   CreateTaskParams,
   GetTaskResponse,
   ClickUpConfig,
+  CommentElement,
+  CommentTextElement,
+  CommentEmoticonElement,
+  CommentTagElement,
+  CommentTextAttributes,
+  CommentBlockAttributes,
 } from "@kendew-agency/clickup-sdk";
 ```
 

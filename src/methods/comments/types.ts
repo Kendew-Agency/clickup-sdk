@@ -4,6 +4,52 @@ import type {
   User,
 } from "../../types/clickup.types";
 
+// Comment element and attribute types
+
+export type CommentTextAttributes = {
+  bold?: true;
+  italic?: true;
+  code?: true;
+  link?: string;
+  [key: string]: unknown;
+};
+
+export type CommentBlockAttributes = {
+  "code-block"?: { "code-block": string };
+  list?: {
+    list: "bullet" | "ordered" | "unchecked" | "checked" | "toggled" | "none";
+  };
+  indent?: number;
+  [key: string]: unknown;
+};
+
+export type CommentTextElement = {
+  text: string;
+  type?: string;
+  attributes?: CommentTextAttributes | CommentBlockAttributes;
+};
+
+export type CommentEmoticonElement = {
+  text: string;
+  type: "emoticon";
+  emoticon: { code: string };
+};
+
+export type CommentTagElement = {
+  type: "tag";
+  user: { id: number };
+};
+
+export type CommentGenericElement = {
+  [key: string]: unknown;
+};
+
+export type CommentElement =
+  | CommentTextElement
+  | CommentEmoticonElement
+  | CommentTagElement
+  | CommentGenericElement;
+
 // Generics
 type CommentUser = Exclude<
   User,
@@ -12,10 +58,7 @@ type CommentUser = Exclude<
 
 type Comment = {
   id: string;
-  comment: {
-    text: string;
-    attributes?: Record<string, unknown>;
-  }[];
+  comment: CommentElement[];
   comment_text: string;
   user: CommentUser;
   resolved: boolean;
@@ -42,17 +85,22 @@ export type GetTaskCommentsResponse = {
   comments: Comment[];
 };
 
+// Comment content XOR: either comment_text or comment array, not both
+export type CommentContent =
+  | { comment_text: string; comment?: never }
+  | { comment: CommentElement[]; comment_text?: never };
+
 // Create task comment
 export type CreateTaskCommentParams = CreateTaskCommentParamsBase &
   ReferenceByCustomTaskId;
 
-export type CreateTaskCommentBody = Pick<
-  CreateTaskCommentParams,
-  "comment_text" | "assignee" | "group_assignee" | "notify_all"
->;
+export type CreateTaskCommentBody = CommentContent & {
+  assignee?: number;
+  group_assignee?: string;
+  notify_all: boolean;
+};
 
-type CreateTaskCommentParamsBase = {
-  comment_text: string;
+type CreateTaskCommentParamsBase = CommentContent & {
   assignee?: number;
   group_assignee?: string;
   notify_all: boolean;
@@ -70,8 +118,7 @@ export type GetChatViewCommentsResponse = {
 // Create chat view comment
 export type CreateChatViewCommentParams = CreateChatViewCommentParamsBase;
 
-type CreateChatViewCommentParamsBase = {
-  comment_text: string;
+type CreateChatViewCommentParamsBase = CommentContent & {
   notify_all: boolean;
 };
 
@@ -87,8 +134,7 @@ export type GetListCommentsResponse = {
 // Create list comment
 export type CreateListCommentParams = CreateListCommentParamsBase;
 
-type CreateListCommentParamsBase = {
-  comment_text: string;
+type CreateListCommentParamsBase = CommentContent & {
   assignee?: number;
   notify_all: boolean;
 };
@@ -96,11 +142,16 @@ type CreateListCommentParamsBase = {
 export type CreateListCommentResponse = CommentResponse;
 
 // Update comment
-export type UpdateCommentParams = {
-  comment_text: string;
-  assignee: number;
-  group_assignee: number;
-  resolved: boolean;
+// Both comment_text and comment are optional (update may only change assignee/resolved),
+// but they are mutually exclusive at the type level.
+export type UpdateCommentContent =
+  | { comment_text?: string; comment?: never }
+  | { comment?: CommentElement[]; comment_text?: never };
+
+export type UpdateCommentParams = UpdateCommentContent & {
+  assignee?: number;
+  group_assignee?: number;
+  resolved?: boolean;
 };
 
 // Get threaded comments

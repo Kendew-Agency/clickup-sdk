@@ -1111,3 +1111,193 @@ describe("Comments - createThreadedComment", () => {
     expect(result.error?.statusCode).toBe(400);
   });
 });
+
+describe("Comments - rich comment array format", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const comments = new Comments(config);
+
+  it("createTaskComment should send comment array in body when provided", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "c1", hist_id: "h1", date: 0 }),
+      } as Response;
+    };
+
+    await comments.createTaskComment("task_123", {
+      comment: [
+        { text: "Bold text", attributes: { bold: true } },
+        { text: "\n" },
+      ],
+      notify_all: true,
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.comment).toEqual([
+      { text: "Bold text", attributes: { bold: true } },
+      { text: "\n" },
+    ]);
+    expect(body.comment_text).toBeUndefined();
+    expect(body.notify_all).toBe(true);
+  });
+
+  it("createChatViewComment should send comment array in body when provided", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "c2", hist_id: "h2", date: 0 }),
+      } as Response;
+    };
+
+    await comments.createChatViewComment("view_123", {
+      comment: [
+        { text: "Hello ", attributes: {} },
+        { text: "world", attributes: { italic: true } },
+        { text: "\n" },
+      ],
+      notify_all: false,
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.comment).toEqual([
+      { text: "Hello ", attributes: {} },
+      { text: "world", attributes: { italic: true } },
+      { text: "\n" },
+    ]);
+    expect(body.comment_text).toBeUndefined();
+  });
+
+  it("createListComment should send comment array in body when provided", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "c3", hist_id: "h3", date: 0 }),
+      } as Response;
+    };
+
+    await comments.createListComment("list_123", {
+      comment: [
+        { text: "Link: ", attributes: {} },
+        { text: "Click here", attributes: { link: "https://example.com" } },
+        { text: "\n" },
+      ],
+      notify_all: true,
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.comment).toEqual([
+      { text: "Link: ", attributes: {} },
+      { text: "Click here", attributes: { link: "https://example.com" } },
+      { text: "\n" },
+    ]);
+    expect(body.comment_text).toBeUndefined();
+    expect(body.assignee).toBeUndefined();
+  });
+
+  it("updateComment should send comment array in body when provided", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await comments.updateComment("comment_123", {
+      comment: [
+        { text: "Updated ", attributes: {} },
+        { text: "formatted", attributes: { code: true } },
+        { text: "\n" },
+      ],
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.comment).toEqual([
+      { text: "Updated ", attributes: {} },
+      { text: "formatted", attributes: { code: true } },
+      { text: "\n" },
+    ]);
+    expect(body.comment_text).toBeUndefined();
+  });
+
+  it("createThreadedComment should send comment array in body when provided", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await comments.createThreadedComment("comment_123", {
+      comment: [
+        { text: "Threaded reply with " },
+        { text: "emoji ", attributes: {} },
+        {
+          text: "\u{1F44D}",
+          type: "emoticon",
+          emoticon: { code: "1f44d" },
+        },
+        { text: "\n" },
+      ],
+      notify_all: false,
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.comment).toBeDefined();
+    expect(body.comment.length).toBe(4);
+    expect(body.comment_text).toBeUndefined();
+  });
+
+  it("createTaskComment should still send comment_text when no comment array", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "c4", hist_id: "h4", date: 0 }),
+      } as Response;
+    };
+
+    await comments.createTaskComment("task_123", {
+      comment_text: "Plain text comment",
+      notify_all: false,
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.comment_text).toBe("Plain text comment");
+    expect(body.comment).toBeUndefined();
+  });
+});
