@@ -117,7 +117,7 @@ The following API endpoints are currently implemented in this SDK:
 
 - **Authorization**: OAuth token exchange, get authorized user
 - **Tasks**: Get, create, update, delete tasks, manage dependencies and links
-- **Comments**: Task, list, and chat view comments with threading support
+- **Comments**: Task, list, and chat view comments with threading and attachment support
 - **Attachments**: Upload task attachments
 - **Custom Task Types**: Get workspace custom task types
 - **Spaces**: Get, create, update, delete spaces
@@ -287,7 +287,9 @@ When reading comments, use the exported type guards to narrow element types:
 
 ```typescript
 import {
+  isAttachmentElement,
   isEmoticonElement,
+  isImageElement,
   isTagElement,
   isTextElement,
 } from "@kendew-agency/clickup-sdk";
@@ -302,9 +304,48 @@ if (result.data) {
         console.log("Mentioned user:", el.user.id);
       } else if (isTextElement(el)) {
         console.log("Text:", el.text, el.attributes);
+      } else if (isAttachmentElement(el)) {
+        console.log("Attachment:", el.attachment.url);
+      } else if (isImageElement(el)) {
+        console.log("Image:", el.image.url, el.image.width, el.image.height);
       }
     }
   }
+}
+```
+
+#### Creating Comments with Attachments
+
+Upload files and create a comment with attachments in a single call:
+
+```typescript
+// Single attachment
+await clickup.comments.createTaskCommentWithAttachment("task_id", {
+  files: [myFile],
+  notify_all: true,
+});
+
+// Multiple attachments with existing comment text
+await clickup.comments.createTaskCommentWithAttachment("task_id", {
+  files: [file1, file2, file3],
+  comment: [{ text: "See attached files" }],
+  notify_all: false,
+});
+```
+
+You can also use the `buildAttachmentElement` utility directly if you need more control:
+
+```typescript
+import { buildAttachmentElement } from "@kendew-agency/clickup-sdk";
+
+const uploadResponse = await clickup.attachments.createTaskAttachment(
+  "task_id",
+  { attachment: myFile },
+);
+
+if (uploadResponse.data) {
+  const element = buildAttachmentElement(uploadResponse.data);
+  // Use element in a comment body
 }
 ```
 
@@ -546,6 +587,10 @@ import type {
   CommentTextElement,
   CommentEmoticonElement,
   CommentTagElement,
+  CommentAttachmentElement,
+  CommentImageElement,
+  AttachmentData,
+  ImageData,
   CommentTextAttributes,
   CommentBlockAttributes,
 } from "@kendew-agency/clickup-sdk";

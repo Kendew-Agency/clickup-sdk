@@ -1,3 +1,6 @@
+import type { Response } from "../../interfaces";
+import { buildAttachmentElement } from "../../utils/builders";
+import { Attachments } from "../attachments/attachments";
 import { Base } from "../base";
 import type {
   CreateChatViewCommentParams,
@@ -7,6 +10,7 @@ import type {
   CreateTaskCommentBody,
   CreateTaskCommentParams,
   CreateTaskCommentResponse,
+  CreateTaskCommentWithAttachmentParams,
   GetChatViewCommentsParams,
   GetChatViewCommentsResponse,
   GetListCommentsParams,
@@ -235,6 +239,39 @@ export class Comments extends Base {
         group_assignee: params.group_assignee,
         notify_all: params.notify_all,
       },
+    });
+  }
+
+  /**
+   * Upload attachments and create a comment with them in one step
+   *
+   * @param task_id as the id of the task to create a comment on
+   * @param params files to upload, optional comment elements, and notify_all flag
+   * @returns the created comment response or an error
+   * @beta this feature is not documented but does work. It is tested in applications at the moment!
+   */
+  public async createTaskCommentWithAttachment(
+    task_id: string,
+    params: CreateTaskCommentWithAttachmentParams,
+  ): Promise<Response<CreateTaskCommentResponse>> {
+    const attachments = new Attachments(this.config);
+    const comment = params.comment ? [...params.comment] : [];
+
+    for (const file of params.files) {
+      const uploadResponse = await attachments.createTaskAttachment(task_id, {
+        attachment: file,
+      });
+
+      if (uploadResponse.error) {
+        return uploadResponse;
+      }
+
+      comment.push(buildAttachmentElement(uploadResponse.data));
+    }
+
+    return this.createTaskComment(task_id, {
+      comment,
+      notify_all: params.notify_all,
     });
   }
 }

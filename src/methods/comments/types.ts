@@ -40,6 +40,55 @@ export type CommentTagElement = {
   user: { id: number };
 };
 
+export type AttachmentData = {
+  id: string;
+  name: string;
+  title: string;
+  extension: string;
+  thumbnail_small: string;
+  thumbnail_medium: string;
+  thumbnail_large: string;
+  url: string;
+};
+
+export type CommentAttachmentElement = {
+  text: string;
+  type: "attachment";
+  attachment: AttachmentData;
+  attributes: {
+    "data-id": string;
+    "data-attachment": AttachmentData;
+  };
+};
+
+export type ImageData = {
+  id: string;
+  name: string;
+  title: string;
+  type: string;
+  extension: string;
+  thumbnail_large: string;
+  thumbnail_medium: string;
+  thumbnail_small: string;
+  url: string;
+  uploaded: boolean;
+  width: number;
+  height: number;
+};
+
+export type CommentImageElement = {
+  text: string;
+  type: "image";
+  image: ImageData;
+  attributes: {
+    width: string;
+    "data-id": string;
+    "data-attachment": AttachmentData;
+    "data-natural-width": string;
+    "data-natural-height": string;
+  };
+};
+
 export type CommentGenericElement = {
   [key: string]: unknown;
 };
@@ -48,6 +97,8 @@ export type CommentElement =
   | CommentTextElement
   | CommentEmoticonElement
   | CommentTagElement
+  | CommentAttachmentElement
+  | CommentImageElement
   | CommentGenericElement;
 
 // Generics
@@ -157,4 +208,11 @@ export type UpdateCommentParams = UpdateCommentContent & {
 // Get threaded comments
 export type GetThreadedCommentsResponse = {
   comments: Comment[];
+};
+
+// Create task comment with attachment
+export type CreateTaskCommentWithAttachmentParams = {
+  files: File[];
+  comment?: CommentElement[];
+  notify_all: boolean;
 };

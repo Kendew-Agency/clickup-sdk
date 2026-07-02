@@ -26,6 +26,7 @@ export type CreateTaskAttachemntResponse = {
   title: string;
   extension: string;
   thumbnail_small: string;
+  thumbnail_medium: string;
   thumbnail_large: string;
   url: string;
 };
