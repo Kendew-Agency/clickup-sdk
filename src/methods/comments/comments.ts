@@ -1,3 +1,6 @@
+import type { Response } from "../../interfaces";
+import { buildAttachmentElement } from "../../utils/builders";
+import { Attachments } from "../attachments/attachments";
 import { Base } from "../base";
 import type {
   CreateChatViewCommentParams,
@@ -7,6 +10,7 @@ import type {
   CreateTaskCommentBody,
   CreateTaskCommentParams,
   CreateTaskCommentResponse,
+  CreateTaskCommentWithAttachmentParams,
   GetChatViewCommentsParams,
   GetChatViewCommentsResponse,
   GetListCommentsParams,
@@ -51,14 +55,18 @@ export class Comments extends Base {
     task_id: string,
     params: CreateTaskCommentParams,
   ) {
+    const body: CreateTaskCommentBody = {
+      ...("comment" in params && params.comment
+        ? { comment: params.comment }
+        : { comment_text: params.comment_text }),
+      assignee: params.assignee,
+      group_assignee: params.group_assignee,
+      notify_all: params.notify_all,
+    };
+
     return this.request<CreateTaskCommentResponse>(`/task/${task_id}/comment`, {
       method: "POST",
-      body: {
-        comment_text: params.comment_text,
-        assignee: params.assignee,
-        group_assignee: params.group_assignee,
-        notify_all: params.notify_all,
-      } satisfies CreateTaskCommentBody,
+      body,
       query: {
         custom_task_ids: params.custom_task_ids,
         team_id: params.team_id,
@@ -104,7 +112,9 @@ export class Comments extends Base {
       {
         method: "POST",
         body: {
-          comment_text: params.comment_text,
+          ...("comment" in params && params.comment
+            ? { comment: params.comment }
+            : { comment_text: params.comment_text }),
           notify_all: params.notify_all,
         },
       },
@@ -144,7 +154,11 @@ export class Comments extends Base {
     return this.request<CreateListCommentResponse>(`/list/${list_id}/comment`, {
       method: "POST",
       body: {
-        ...params,
+        ...("comment" in params && params.comment
+          ? { comment: params.comment }
+          : { comment_text: params.comment_text }),
+        assignee: params.assignee,
+        notify_all: params.notify_all,
       },
     });
   }
@@ -159,10 +173,18 @@ export class Comments extends Base {
     comment_id: string,
     params: Partial<UpdateCommentParams>,
   ) {
+    const { assignee, group_assignee, resolved, ...rest } = params;
     return this.request<void>(`/comment/${comment_id}`, {
       method: "PUT",
       body: {
-        ...params,
+        ...("comment" in rest && rest.comment
+          ? { comment: rest.comment }
+          : rest.comment_text !== undefined
+            ? { comment_text: rest.comment_text }
+            : {}),
+        ...(assignee !== undefined && { assignee }),
+        ...(group_assignee !== undefined && { group_assignee }),
+        ...(resolved !== undefined && { resolved }),
       },
     });
   }
@@ -210,8 +232,46 @@ export class Comments extends Base {
     return this.request<void>(`/comment/${comment_id}/reply`, {
       method: "POST",
       body: {
-        ...params,
+        ...("comment" in params && params.comment
+          ? { comment: params.comment }
+          : { comment_text: params.comment_text }),
+        assignee: params.assignee,
+        group_assignee: params.group_assignee,
+        notify_all: params.notify_all,
       },
+    });
+  }
+
+  /**
+   * Upload attachments and create a comment with them in one step
+   *
+   * @param task_id as the id of the task to create a comment on
+   * @param params files to upload, optional comment elements, and notify_all flag
+   * @returns the created comment response or an error
+   * @beta this feature is not documented but does work. It is tested in applications at the moment!
+   */
+  public async createTaskCommentWithAttachment(
+    task_id: string,
+    params: CreateTaskCommentWithAttachmentParams,
+  ): Promise<Response<CreateTaskCommentResponse>> {
+    const attachments = new Attachments(this.config);
+    const comment = params.comment ? [...params.comment] : [];
+
+    for (const file of params.files) {
+      const uploadResponse = await attachments.createTaskAttachment(task_id, {
+        attachment: file,
+      });
+
+      if (uploadResponse.error) {
+        return uploadResponse;
+      }
+
+      comment.push(buildAttachmentElement(uploadResponse.data));
+    }
+
+    return this.createTaskComment(task_id, {
+      comment,
+      notify_all: params.notify_all,
     });
   }
 }

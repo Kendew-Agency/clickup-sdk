@@ -117,7 +117,7 @@ The following API endpoints are currently implemented in this SDK:
 
 - **Authorization**: OAuth token exchange, get authorized user
 - **Tasks**: Get, create, update, delete tasks, manage dependencies and links
-- **Comments**: Task, list, and chat view comments with threading support
+- **Comments**: Task, list, and chat view comments with threading and attachment support
 - **Attachments**: Upload task attachments
 - **Custom Task Types**: Get workspace custom task types
 - **Spaces**: Get, create, update, delete spaces
@@ -207,15 +207,47 @@ await clickup.tasks.deleteTaskLink("task_id", {
 // Get task comments (paginated, max 25 per request)
 const comments = await clickup.comments.getTaskComments("task_id");
 
-// Create task comment
+// Create task comment (plain text)
 const comment = await clickup.comments.createTaskComment("task_id", {
   comment_text: "This is a comment",
   notify_all: true,
 });
 
+// Create task comment (rich formatting)
+await clickup.comments.createTaskComment("task_id", {
+  comment: [
+    { text: "Important: ", attributes: { bold: true } },
+    { text: "Check this ", attributes: {} },
+    { text: "link", attributes: { link: "https://clickup.com/docs" } },
+    { text: "\n", attributes: { list: { list: "bullet" } } },
+  ],
+  notify_all: true,
+});
+
+// Comment with emoji and user mention
+await clickup.comments.createTaskComment("task_id", {
+  comment: [
+    { text: "Great work " },
+    { text: "\u{1F44D}", type: "emoticon", emoticon: { code: "1f44d" } },
+    { text: " " },
+    { type: "tag", user: { id: 1234567 } },
+    { text: "\n" },
+  ],
+  notify_all: false,
+});
+
 // Update comment
 await clickup.comments.updateComment("comment_id", {
   comment_text: "Updated comment",
+});
+
+// Update comment (rich formatting)
+await clickup.comments.updateComment("comment_id", {
+  comment: [
+    { text: "Updated with " },
+    { text: "formatting", attributes: { italic: true } },
+    { text: "\n" },
+  ],
 });
 
 // Delete comment
@@ -227,6 +259,7 @@ const replies = await clickup.comments.getThreadedComments("comment_id");
 // Create threaded comment
 await clickup.comments.createThreadedComment("comment_id", {
   comment_text: "Reply to comment",
+  notify_all: false,
 });
 
 // Get chat view comments
@@ -235,6 +268,7 @@ const chatComments = await clickup.comments.getChatViewComments("view_id");
 // Create chat view comment
 await clickup.comments.createChatViewComment("view_id", {
   comment_text: "Chat message",
+  notify_all: true,
 });
 
 // Get list comments
@@ -243,7 +277,76 @@ const listComments = await clickup.comments.getListComments("list_id");
 // Create list comment
 await clickup.comments.createListComment("list_id", {
   comment_text: "List comment",
+  notify_all: true,
 });
+```
+
+#### Type Guards for Comment Elements
+
+When reading comments, use the exported type guards to narrow element types:
+
+```typescript
+import {
+  isAttachmentElement,
+  isEmoticonElement,
+  isImageElement,
+  isTagElement,
+  isTextElement,
+} from "@kendew-agency/clickup-sdk";
+
+const result = await clickup.comments.getTaskComments("task_id");
+if (result.data) {
+  for (const comment of result.data.comments) {
+    for (const el of comment.comment) {
+      if (isEmoticonElement(el)) {
+        console.log("Emoji:", el.emoticon.code);
+      } else if (isTagElement(el)) {
+        console.log("Mentioned user:", el.user.id);
+      } else if (isTextElement(el)) {
+        console.log("Text:", el.text, el.attributes);
+      } else if (isAttachmentElement(el)) {
+        console.log("Attachment:", el.attachment.url);
+      } else if (isImageElement(el)) {
+        console.log("Image:", el.image.url, el.image.width, el.image.height);
+      }
+    }
+  }
+}
+```
+
+#### Creating Comments with Attachments
+
+Upload files and create a comment with attachments in a single call:
+
+```typescript
+// Single attachment
+await clickup.comments.createTaskCommentWithAttachment("task_id", {
+  files: [myFile],
+  notify_all: true,
+});
+
+// Multiple attachments with existing comment text
+await clickup.comments.createTaskCommentWithAttachment("task_id", {
+  files: [file1, file2, file3],
+  comment: [{ text: "See attached files" }],
+  notify_all: false,
+});
+```
+
+You can also use the `buildAttachmentElement` utility directly if you need more control:
+
+```typescript
+import { buildAttachmentElement } from "@kendew-agency/clickup-sdk";
+
+const uploadResponse = await clickup.attachments.createTaskAttachment(
+  "task_id",
+  { attachment: myFile },
+);
+
+if (uploadResponse.data) {
+  const element = buildAttachmentElement(uploadResponse.data);
+  // Use element in a comment body
+}
 ```
 
 ### Attachments
@@ -480,6 +583,16 @@ import type {
   CreateTaskParams,
   GetTaskResponse,
   ClickUpConfig,
+  CommentElement,
+  CommentTextElement,
+  CommentEmoticonElement,
+  CommentTagElement,
+  CommentAttachmentElement,
+  CommentImageElement,
+  AttachmentData,
+  ImageData,
+  CommentTextAttributes,
+  CommentBlockAttributes,
 } from "@kendew-agency/clickup-sdk";
 ```
 
