@@ -142,4 +142,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `toUnixMillis` added as a utility to convert dates to unix time
 - `fromUnixMillis` added as a utility to convert unix time to a regular date
 
-[0.3.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.4.0
+[0.4.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.4.0
+
+## [0.5.0] - 2026-07-02
+
+### Added
+
+- Formatted comments support: comment creation and update methods now accept structured `comment` arrays (rich text with bold, italic, code, links, lists, and code blocks) as an alternative to plain `comment_text`
+- `createTaskCommentWithAttachment` method to upload attachments and create a comment with them in one step (beta)
+- Type guard utilities for comment elements: `isTextElement`, `isEmoticonElement`, `isTagElement`, `isAttachmentElement`, `isImageElement`
+- `buildAttachmentElement` builder utility to construct attachment comment elements from upload responses
+- Comprehensive comment element types: `CommentTextElement`, `CommentEmoticonElement`, `CommentTagElement`, `CommentAttachmentElement`, `CommentImageElement`, `CommentGenericElement`
+- `CommentTextAttributes` and `CommentBlockAttributes` types for structured text formatting
+- `ImageData` and `AttachmentData` types for media in comments
+- `thumbnail_medium` field added to `CreateTaskAttachemntResponse`
+
+### Changed
+
+- Comment creation methods (`createTaskComment`, `createChatViewComment`, `createListComment`, `createThreadedComment`) now use a `CommentContent` discriminated union — either `comment_text` (plain) or `comment` (formatted), but not both
+- `UpdateCommentParams` fields (`assignee`, `group_assignee`, `resolved`) are now optional
+- Comment type changed from `{ text: string; attributes?: Record<string, unknown> }[]` to the typed `CommentElement[]` union
+
+[0.5.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.0
