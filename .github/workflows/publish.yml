@@ -1,5 +1,6 @@
 name: Publish to NPM
 on:
+  workflow_dispatch:
   push:
     tags:
       - 'v*'
@@ -33,5 +34,9 @@ jobs:
             echo "Version mismatch: tag=$VERSION, package.json=$FILE_VERSION"
             exit 1
           fi
+      - name: Debug npm config
+        run: |
+          npm config list
+          npm whoami --registry https://registry.npmjs.org || echo "Not authenticated"
       - name: Publish to NPM
         run: npm publish --provenance --access public
