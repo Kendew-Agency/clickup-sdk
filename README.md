@@ -122,7 +122,7 @@ The following API endpoints are currently implemented in this SDK:
 - **Custom Task Types**: Get workspace custom task types
 - **Spaces**: Get, create, update, delete spaces
 - **Folders**: Get, create, update, delete folders
-- **Lists**: Get, create, update, delete lists
+- **Lists**: Get, create, update, delete lists, add tasks to lists
 - **Goals**: Get, create, update, delete goals
 - **Tags**: Get, create, update, delete tags, manage task tags
 - **Custom Fields**: Get accessible fields, set and remove values
@@ -456,6 +456,16 @@ await clickup.lists.updateList("list_id", {
 
 // Delete a list
 await clickup.lists.deleteList("list_id");
+
+// Add an existing task to an additional list
+// (requires the "Tasks in Multiple Lists" ClickApp to be enabled)
+await clickup.lists.addTaskToList("list_id", "task_id");
+
+// Add a task using custom task IDs
+await clickup.lists.addTaskToList("list_id", "CUSTOM-123", {
+  custom_task_ids: true,
+  team_id: 123,
+});
 ```
 
 ### Goals
