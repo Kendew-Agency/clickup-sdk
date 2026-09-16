@@ -161,6 +161,12 @@ docs: update README with webhook examples
 - [ ] CHANGELOG.md updated (for significant changes)
 - [ ] Commit messages follow conventional format
 
+## Releasing and Publishing
+
+Releases are published to npm automatically via GitHub Actions using trusted
+publishing (OIDC). For the release flow, npm version verification, and the
+one-time trusted-publisher setup, see [docs/publishing.md](docs/publishing.md).
+
 ## Reporting Issues
 
 When reporting issues, please include:
