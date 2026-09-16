@@ -1,5 +1,7 @@
 import { Base } from "../base";
 import type {
+  AddTaskToListParams,
+  AddTaskToListResponse,
   CreateFolderlessListParams,
   CreateFolderlessListResponse,
   CreateListParams,
@@ -159,5 +161,32 @@ export class Lists extends Base {
     return this.request<void>(`/list/${list_id}`, {
       method: "DELETE",
     });
+  }
+
+  /**
+   * Add a task to a list
+   *
+   * @description adds an existing task to an additional list. Requires the
+   *   "Tasks in Multiple Lists" ClickApp to be enabled on the workspace.
+   * @param list_id as the id of the list to add the task to
+   * @param task_id as the id of the task to add
+   * @param params optional parameters for custom task id resolution
+   * @see https://developer.clickup.com/reference/addtasktolist
+   */
+  public async addTaskToList(
+    list_id: string,
+    task_id: string,
+    params?: AddTaskToListParams,
+  ) {
+    return this.request<AddTaskToListResponse>(
+      `/list/${list_id}/task/${task_id}`,
+      {
+        method: "POST",
+        query: {
+          custom_task_ids: params?.custom_task_ids,
+          team_id: params?.team_id,
+        },
+      },
+    );
   }
 }
