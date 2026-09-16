@@ -164,3 +164,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comment type changed from `{ text: string; attributes?: Record<string, unknown> }[]` to the typed `CommentElement[]` union
 
 [0.5.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.0
+
+## [0.5.1] - 2026-09-16
+
+### Added
+
+- `addTaskToList` method on the Lists resource to add an existing task to an additional list (requires the "Tasks in Multiple Lists" ClickApp). Supports custom task IDs via `custom_task_ids` and `team_id`.
+- `AddTaskToListParams` and `AddTaskToListResponse` types
+
+[0.5.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.1
