@@ -117,16 +117,3 @@ export type UpdateListParams = {
 };
 
 export type UpdateListResponse = List;
-
-// Add task to list
-export type AddTaskToListParams =
-  | {
-      custom_task_ids: true;
-      team_id: number;
-    }
-  | {
-      custom_task_ids?: false;
-      team_id?: number;
-    };
-
-export type AddTaskToListResponse = void;

@@ -871,27 +871,7 @@ describe("Lists - addTaskToList", () => {
     expect(capturedMethod).toBe("POST");
   });
 
-  it("should include custom_task_ids and team_id in query string when provided", async () => {
-    let capturedUrl = "";
-    globalThis.fetch = async (url: RequestInfo | URL) => {
-      capturedUrl = url.toString();
-      return {
-        ok: true,
-        status: 200,
-        text: async () => "",
-      } as Response;
-    };
-
-    await lists.addTaskToList("list_123", "task_456", {
-      custom_task_ids: true,
-      team_id: 123,
-    });
-
-    expect(capturedUrl).toContain("custom_task_ids=true");
-    expect(capturedUrl).toContain("team_id=123");
-  });
-
-  it("should omit query params when not provided", async () => {
+  it("should not include query params", async () => {
     let capturedUrl = "";
     globalThis.fetch = async (url: RequestInfo | URL) => {
       capturedUrl = url.toString();
@@ -904,8 +884,7 @@ describe("Lists - addTaskToList", () => {
 
     await lists.addTaskToList("list_123", "task_456");
 
-    expect(capturedUrl).not.toContain("custom_task_ids");
-    expect(capturedUrl).not.toContain("team_id");
+    expect(capturedUrl).not.toContain("?");
     expect(capturedUrl).toBe(
       "https://api.clickup.com/api/v2/list/list_123/task/task_456",
     );
@@ -956,6 +935,118 @@ describe("Lists - addTaskToList", () => {
       }) as Response;
 
     const result = await lists.addTaskToList("list_999", "task_456");
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(403);
+  });
+});
+
+describe("Lists - removeTaskFromList", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const lists = new Lists(config);
+
+  it("should construct correct endpoint with list_id and task_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => "",
+      } as Response;
+    };
+
+    await lists.removeTaskFromList("list_123", "task_456");
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/list/list_123/task/task_456",
+    );
+  });
+
+  it("should use DELETE HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => "",
+      } as Response;
+    };
+
+    await lists.removeTaskFromList("list_123", "task_456");
+
+    expect(capturedMethod).toBe("DELETE");
+  });
+
+  it("should not include query params", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => "",
+      } as Response;
+    };
+
+    await lists.removeTaskFromList("list_123", "task_456");
+
+    expect(capturedUrl).not.toContain("?");
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/list/list_123/task/task_456",
+    );
+  });
+
+  it("should not include request body", async () => {
+    let capturedBody: string | undefined;
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string | undefined;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => "",
+      } as Response;
+    };
+
+    await lists.removeTaskFromList("list_123", "task_456");
+
+    expect(capturedBody).toBeUndefined();
+  });
+
+  it("should handle successful empty response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => "",
+      }) as Response;
+
+    const result = await lists.removeTaskFromList("list_123", "task_456");
+
+    expect(result.data).toEqual({});
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 403,
+        statusText: "Forbidden",
+        json: async () => ({
+          message: "Tasks in Multiple Lists ClickApp is not enabled",
+        }),
+      }) as Response;
+
+    const result = await lists.removeTaskFromList("list_999", "task_456");
 
     expect(result.data).toBeNull();
     expect(result.error).not.toBeNull();

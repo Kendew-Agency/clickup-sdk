@@ -173,3 +173,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AddTaskToListParams` and `AddTaskToListResponse` types
 
 [0.5.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.1
+
+## [0.5.2] - 2026-09-18
+
+### Added
+
+- `removeTaskFromList` method on the Lists resource to remove a task from an additional list (requires the "Tasks in Multiple Lists" ClickApp). You can't remove a task from its home list.
