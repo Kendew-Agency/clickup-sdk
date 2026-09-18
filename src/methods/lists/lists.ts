@@ -1,7 +1,5 @@
 import { Base } from "../base";
 import type {
-  AddTaskToListParams,
-  AddTaskToListResponse,
   CreateFolderlessListParams,
   CreateFolderlessListResponse,
   CreateListParams,
@@ -170,23 +168,27 @@ export class Lists extends Base {
    *   "Tasks in Multiple Lists" ClickApp to be enabled on the workspace.
    * @param list_id as the id of the list to add the task to
    * @param task_id as the id of the task to add
-   * @param params optional parameters for custom task id resolution
    * @see https://developer.clickup.com/reference/addtasktolist
    */
-  public async addTaskToList(
-    list_id: string,
-    task_id: string,
-    params?: AddTaskToListParams,
-  ) {
-    return this.request<AddTaskToListResponse>(
-      `/list/${list_id}/task/${task_id}`,
-      {
-        method: "POST",
-        query: {
-          custom_task_ids: params?.custom_task_ids,
-          team_id: params?.team_id,
-        },
-      },
-    );
+  public async addTaskToList(list_id: string, task_id: string) {
+    return this.request<void>(`/list/${list_id}/task/${task_id}`, {
+      method: "POST",
+    });
+  }
+
+  /**
+   * Remove a task from a list
+   *
+   * @description removes a task from an additional list. You can't remove a
+   *   task from its home list. Requires the "Tasks in Multiple Lists" ClickApp
+   *   to be enabled on the workspace.
+   * @param list_id as the id of the list to remove the task from
+   * @param task_id as the id of the task to remove
+   * @see https://developer.clickup.com/reference/removetaskfromlist
+   */
+  public async removeTaskFromList(list_id: string, task_id: string) {
+    return this.request<void>(`/list/${list_id}/task/${task_id}`, {
+      method: "DELETE",
+    });
   }
 }

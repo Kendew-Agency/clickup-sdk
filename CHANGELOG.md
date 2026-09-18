@@ -173,3 +173,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AddTaskToListParams` and `AddTaskToListResponse` types
 
 [0.5.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.1
+
+## [0.5.2] - 2026-09-18
+
+### Added
+
+- `removeTaskFromList` method on the Lists resource to remove a task from an additional list (requires the "Tasks in Multiple Lists" ClickApp). You can't remove a task from its home list.
+
+### Fixed
+
+- `addTaskToList` no longer accepts the undocumented `custom_task_ids` and `team_id` query params. [ClickUp docs](https://developer.clickup.com/reference/addtasktolist), this endpoint only takes `list_id` and `task_id` path params.
+
+### Removed
+
+- `AddTaskToListParams` and `AddTaskToListResponse` types (the endpoint has no query params and returns an empty response)
+
+[0.5.2]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.2

@@ -461,11 +461,8 @@ await clickup.lists.deleteList("list_id");
 // (requires the "Tasks in Multiple Lists" ClickApp to be enabled)
 await clickup.lists.addTaskToList("list_id", "task_id");
 
-// Add a task using custom task IDs
-await clickup.lists.addTaskToList("list_id", "CUSTOM-123", {
-  custom_task_ids: true,
-  team_id: 123,
-});
+// Remove a task from an additional list
+await clickup.lists.removeTaskFromList("list_id", "task_id");
 ```
 
 ### Goals
