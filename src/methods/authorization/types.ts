@@ -13,3 +13,18 @@ export type AccessTokenResponse = {
 export type GetAuthorizedUserResponse = {
   user: User;
 };
+
+// Authorized Workspaces
+type AuthorizedWorkspace = {
+  id: string;
+  name: string;
+  color: string;
+  avatar: string;
+  members: {
+    user: User;
+  }[];
+};
+
+export type GetAuthorizedWorkspacesResponse = {
+  teams: AuthorizedWorkspace[];
+};

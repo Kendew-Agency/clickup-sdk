@@ -81,8 +81,37 @@ type CustomField = {
   required: boolean;
 };
 
+// Set Custom Field value
+export type SetCustomFieldValueParams = {
+  custom_task_ids?: boolean;
+  team_id?: number;
+  value:
+    | string
+    | number
+    | boolean
+    | null
+    | {
+        add?: string[];
+        rem?: string[];
+      };
+  value_options?: {
+    time?: boolean;
+  };
+};
+
+export type RemoveCustomFieldValueParams = {
+  custom_task_ids?: boolean;
+  team_id?: number;
+};
+
+
+
 // Response Types
 export type GetListCustomFieldsResponse = {
+  fields: CustomField[];
+};
+
+export type GetFolderCustomFieldsResponse = {
   fields: CustomField[];
 };
 

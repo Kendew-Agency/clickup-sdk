@@ -1,7 +1,7 @@
 import { Base } from "../base";
 import type {
-  CreateTaskAttachemntParams,
-  CreateTaskAttachemntResponse,
+  CreateTaskAttachmentParams,
+  CreateTaskAttachmentResponse,
 } from "./types";
 
 export class Attachments extends Base {
@@ -14,7 +14,7 @@ export class Attachments extends Base {
    */
   public async createTaskAttachment(
     task_id: string,
-    params: CreateTaskAttachemntParams,
+    params: CreateTaskAttachmentParams,
   ) {
     // Clicup expects a multipart/form-data request
 
@@ -25,7 +25,7 @@ export class Attachments extends Base {
     // Append the attachment to the form data
     formData.append(`attachment`, params.attachment, sanitizedFileName);
 
-    return this.request<CreateTaskAttachemntResponse>(
+    return this.request<CreateTaskAttachmentResponse>(
       `/task/${task_id}/attachment`,
       {
         method: "POST",
