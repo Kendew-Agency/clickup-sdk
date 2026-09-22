@@ -155,7 +155,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive comment element types: `CommentTextElement`, `CommentEmoticonElement`, `CommentTagElement`, `CommentAttachmentElement`, `CommentImageElement`, `CommentGenericElement`
 - `CommentTextAttributes` and `CommentBlockAttributes` types for structured text formatting
 - `ImageData` and `AttachmentData` types for media in comments
-- `thumbnail_medium` field added to `CreateTaskAttachemntResponse`
+- `thumbnail_medium` field added to `CreateTaskAttachmentResponse`
 
 ### Changed
 

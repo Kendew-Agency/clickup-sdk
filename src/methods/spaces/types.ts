@@ -64,20 +64,20 @@ export type GetSpaceResponse = Space;
 // Create space
 export type CreateSpaceParams = {
   name: string;
-  multiple_assignees?: boolean;
-  features?: SpaceFeatures;
+  multiple_assignees: boolean;
+  features: SpaceFeatures;
 };
 
 export type CreateSpaceResponse = Space;
 
 // Update space
 export type UpdateSpaceParams = {
-  name?: string;
-  color?: string;
-  private?: boolean;
-  admin_can_manage?: boolean;
-  multiple_assignees?: boolean;
-  features?: SpaceFeatures;
+  name: string;
+  color: string;
+  private: boolean;
+  admin_can_manage: boolean;
+  multiple_assignees: boolean;
+  features: SpaceFeatures;
 };
 
 export type UpdateSpaceResponse = Space;

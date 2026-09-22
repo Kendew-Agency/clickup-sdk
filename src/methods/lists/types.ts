@@ -117,3 +117,23 @@ export type UpdateListParams = {
 };
 
 export type UpdateListResponse = List;
+
+// Create list from template in folder
+export type CreateListFromTemplateParams = {
+  name: string;
+  options?: object;
+};
+
+export type CreateListFromTemplateInFolderResponse = {
+  id: string;
+};
+
+// Create list from template in space
+export type CreateListFromTemplateInSpaceParams = {
+  name: string;
+  options?: object;
+};
+
+export type CreateListFromTemplateInSpaceResponse = {
+  id: string;
+};

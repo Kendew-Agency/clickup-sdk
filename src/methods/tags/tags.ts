@@ -1,8 +1,10 @@
 import { Base } from "../base";
 import type {
+  AddTagToTaskParams,
   CreateSpaceTagParams,
   CreateSpaceTagResponse,
   GetSpaceTagsResponse,
+  RemoveTagFromTaskParams,
   UpdateSpaceTagParams,
   UpdateSpaceTagResponse,
 } from "./types";
@@ -77,6 +79,51 @@ export class Tags extends Base {
   public async deleteSpaceTag(space_id: string, tag_name: string) {
     return this.request<void>(`/space/${space_id}/tag/${tag_name}`, {
       method: "DELETE",
+    });
+  }
+  /**
+   * Add Tag to Task
+   *
+   * @description adds an existing tag to a task
+   * @param task_id as the id of the task
+   * @param tag_name as the name of the tag to add
+   * @param params optional parameters for custom task IDs
+   * @see https://developer.clickup.com/reference/addtagtotask
+   */
+  public async addTagToTask(
+    task_id: string,
+    tag_name: string,
+    params?: AddTagToTaskParams,
+  ) {
+    return this.request<void>(`/task/${task_id}/tag/${tag_name}`, {
+      method: "POST",
+      query: {
+        custom_task_ids: params?.custom_task_ids,
+        team_id: params?.team_id,
+      },
+    });
+  }
+
+  /**
+   * Remove Tag From Task
+   *
+   * @description removes a tag from a task without deleting the tag from the space
+   * @param task_id as the id of the task
+   * @param tag_name as the name of the tag to remove
+   * @param params optional parameters for custom task IDs
+   * @see https://developer.clickup.com/reference/removetagfromtask
+   */
+  public async removeTagFromTask(
+    task_id: string,
+    tag_name: string,
+    params?: RemoveTagFromTaskParams,
+  ) {
+    return this.request<void>(`/task/${task_id}/tag/${tag_name}`, {
+      method: "DELETE",
+      query: {
+        custom_task_ids: params?.custom_task_ids,
+        team_id: params?.team_id,
+      },
     });
   }
 }
