@@ -196,56 +196,56 @@ export class Lists extends Base {
   }
 
   /**
- * Create List From Template in Folder
- *
- * @description creates a new list from a template within a folder
- * @param folder_id as the id of the folder to create the list in
- * @param template_id as the id of the list template
- * @param params list creation parameters
- * @returns Created list details
- * @see https://developer.clickup.com/reference/createfolderlistfromtemplate
- */
-public async createListFromTemplate(
-  folder_id: string,
-  template_id: string,
-  params: CreateListFromTemplateParams
-) {
-  return this.request<CreateListFromTemplateInSpaceResponse>(
-    `/folder/${folder_id}/list_template/${template_id}`,
-    {
-      method: "POST",
-      body: {
-        name: params.name,
-        options: params.options,
+   * Create List From Template in Folder
+   *
+   * @description creates a new list from a template within a folder
+   * @param folder_id as the id of the folder to create the list in
+   * @param template_id as the id of the list template
+   * @param params list creation parameters
+   * @returns Created list details
+   * @see https://developer.clickup.com/reference/createfolderlistfromtemplate
+   */
+  public async createListFromTemplate(
+    folder_id: string,
+    template_id: string,
+    params: CreateListFromTemplateParams,
+  ) {
+    return this.request<CreateListFromTemplateInSpaceResponse>(
+      `/folder/${folder_id}/list_template/${template_id}`,
+      {
+        method: "POST",
+        body: {
+          name: params.name,
+          options: params.options,
+        },
       },
-    }
-  );
-}
+    );
+  }
 
-/**
- * Create List From Template in Space
- *
- * @description creates a new folderless list from a template within a space
- * @param space_id as the id of the space to create the list in
- * @param template_id as the id of the list template
- * @param params list creation parameters
- * @returns Created list details
- * @see https://developer.clickup.com/reference/createspacelistfromtemplate
- */
-public async createListFromTemplateInSpace(
-  space_id: string,
-  template_id: string,
-  params: CreateListFromTemplateInSpaceParams
-) {
-  return this.request<CreateListFromTemplateInSpaceResponse>(
-    `/space/${space_id}/list_template/${template_id}`,
-    {
-      method: "POST",
-      body: {
-        name: params.name,
-        options: params.options,
+  /**
+   * Create List From Template in Space
+   *
+   * @description creates a new folderless list from a template within a space
+   * @param space_id as the id of the space to create the list in
+   * @param template_id as the id of the list template
+   * @param params list creation parameters
+   * @returns Created list details
+   * @see https://developer.clickup.com/reference/createspacelistfromtemplate
+   */
+  public async createListFromTemplateInSpace(
+    space_id: string,
+    template_id: string,
+    params: CreateListFromTemplateInSpaceParams,
+  ) {
+    return this.request<CreateListFromTemplateInSpaceResponse>(
+      `/space/${space_id}/list_template/${template_id}`,
+      {
+        method: "POST",
+        body: {
+          name: params.name,
+          options: params.options,
+        },
       },
-    }
-  );
-}
+    );
+  }
 }

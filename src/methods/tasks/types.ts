@@ -104,7 +104,7 @@ export type GetTasksParams = {
   date_updated_gt?: number;
   date_updated_lt?: number;
   date_done_gt?: number;
-   date_done_lt?: number;
+  date_done_lt?: number;
   custom_fields?: string;
   custom_field?: string;
   custom_items?: number[];
@@ -122,7 +122,6 @@ export type GetTaskParams = ReferenceByCustomTaskId & {
   include_subtasks?: boolean;
   include_markdown_description?: boolean;
   custom_fields: string;
-
 };
 
 export type GetTaskResponse = Task;
@@ -179,12 +178,11 @@ export type UpdateTaskParams = ReferenceByCustomTaskId & {
   group_assignees?: {
     add?: string[];
     rem?: string[];
-  }
-  watchers?:
-    {
-      add: number[];
-      rem: number[];
-    }
+  };
+  watchers?: {
+    add: number[];
+    rem: number[];
+  };
   archived?: boolean;
 };
 
@@ -283,7 +281,6 @@ export type CreateTaskFromTemplateParams = {
 };
 
 export type CreateTaskFromTemplateResponse = Record<string, unknown>;
-
 
 // Add task link
 export type AddTaskLinkParams = ReferenceByCustomTaskId & {

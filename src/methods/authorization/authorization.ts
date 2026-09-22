@@ -17,12 +17,12 @@ export class Authorization extends Base {
     return this.request<AccessTokenResponse>("/oauth/token", {
       method: "POST",
       body: {
-      client_id: params.client_id,
-      client_secret: params.client_secret,
-      code: params.code,
-    },
-  });
-}
+        client_id: params.client_id,
+        client_secret: params.client_secret,
+        code: params.code,
+      },
+    });
+  }
 
   /**
    * Get the authorized user connected to the current token
@@ -34,7 +34,7 @@ export class Authorization extends Base {
       method: "GET",
     });
   }
-  
+
   /**
    * Get Authorized Workspaces
    *

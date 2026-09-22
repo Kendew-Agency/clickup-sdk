@@ -93,43 +93,37 @@ export class Tags extends Base {
   public async addTagToTask(
     task_id: string,
     tag_name: string,
-    params?: AddTagToTaskParams
+    params?: AddTagToTaskParams,
   ) {
-    return this.request<void>(
-      `/task/${task_id}/tag/${tag_name}`,
-      {
-        method: "POST",
-        query: {
-          custom_task_ids: params?.custom_task_ids,
-          team_id: params?.team_id,
-        },
-      }
-    );
+    return this.request<void>(`/task/${task_id}/tag/${tag_name}`, {
+      method: "POST",
+      query: {
+        custom_task_ids: params?.custom_task_ids,
+        team_id: params?.team_id,
+      },
+    });
   }
 
   /**
- * Remove Tag From Task
- *
- * @description removes a tag from a task without deleting the tag from the space
- * @param task_id as the id of the task
- * @param tag_name as the name of the tag to remove
- * @param params optional parameters for custom task IDs
- * @see https://developer.clickup.com/reference/removetagfromtask
- */
-public async removeTagFromTask(
-  task_id: string,
-  tag_name: string,
-  params?: RemoveTagFromTaskParams
-) {
-  return this.request<void>(
-    `/task/${task_id}/tag/${tag_name}`,
-    {
+   * Remove Tag From Task
+   *
+   * @description removes a tag from a task without deleting the tag from the space
+   * @param task_id as the id of the task
+   * @param tag_name as the name of the tag to remove
+   * @param params optional parameters for custom task IDs
+   * @see https://developer.clickup.com/reference/removetagfromtask
+   */
+  public async removeTagFromTask(
+    task_id: string,
+    tag_name: string,
+    params?: RemoveTagFromTaskParams,
+  ) {
+    return this.request<void>(`/task/${task_id}/tag/${tag_name}`, {
       method: "DELETE",
       query: {
         custom_task_ids: params?.custom_task_ids,
         team_id: params?.team_id,
       },
-    }
-  );
-}
+    });
+  }
 }

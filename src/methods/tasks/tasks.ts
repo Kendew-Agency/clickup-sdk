@@ -38,8 +38,7 @@ export class Tasks extends Base {
       method: "GET",
       query: {
         archived: params?.archived,
-        include_markdown_description: 
-          params?.include_markdown_description,
+        include_markdown_description: params?.include_markdown_description,
         page: params?.page,
         order_by: params?.order_by,
         reverse: params?.reverse,
@@ -55,8 +54,7 @@ export class Tasks extends Base {
         date_created_lt: params?.date_created_lt,
         date_updated_gt: params?.date_updated_gt,
         date_updated_lt: params?.date_updated_lt,
-        date_done_gt: params
-?.date_done_gt,
+        date_done_gt: params?.date_done_gt,
         date_done_lt: params?.date_done_lt,
         custom_fields: params?.custom_fields,
         custom_field: params?.custom_field,
@@ -82,7 +80,7 @@ export class Tasks extends Base {
         team_id: params?.team_id,
         include_subtasks: params?.include_subtasks,
         include_markdown_description: params?.include_markdown_description,
-      custom_fields: params?.custom_fields,
+        custom_fields: params?.custom_fields,
       },
     });
   }
@@ -159,144 +157,139 @@ export class Tasks extends Base {
     });
   }
 
-/**
- * Get Filtered Team Tasks
- * @description returns tasks filtered by various criteria within a team
- * @param team_id as the id of the team to filter tasks for
- * @param params filtering parameters
- * @returns Filtered tasks
- * @see https://developer.clickup.com/reference/getfilteredteammtasks
- */
-  public async getFilteredTeamTasks(team_id: string, params?: GetFilteredTeamTasksParams
-) {
-  return this.request<GetFilteredTeamTasksResponse>(`/team/${team_id}/task`, {
-    method: "GET",
-    query: {
- page: params?.page,
-  order_by: params?.order_by,
-  reverse: params?.reverse,
-  subtasks: params?.subtasks,
-  space_ids: params?.space_ids,
-  project_ids: params?.project_ids,
-  list_ids: params?.list_ids,
-  statuses: params?.statuses,
-  include_closed: params?.include_closed,
-  assignees: params?.assignees,
-  tags: params?.tags,
-  due_date_gt: params?.due_date_gt,
-  due_date_lt: params?.due_date_lt,
-  date_created_gt: params?.date_created_gt,
-  date_created_lt: params?.date_created_lt,
-  date_updated_gt: params?.date_updated_gt,
-  date_updated_lt: params?.date_updated_lt,
-  date_done_gt: params?.date_done_gt,
-  date_done_lt: params?.date_done_lt,
-  custom_fields: params?.custom_fields,
-  parent: params?.parent,
-  include_markdown_description: params?.include_markdown_description,
-  custom_items: params?.custom_items,
-    },
-  });
-}
+  /**
+   * Get Filtered Team Tasks
+   * @description returns tasks filtered by various criteria within a team
+   * @param team_id as the id of the team to filter tasks for
+   * @param params filtering parameters
+   * @returns Filtered tasks
+   * @see https://developer.clickup.com/reference/getfilteredteammtasks
+   */
+  public async getFilteredTeamTasks(
+    team_id: string,
+    params?: GetFilteredTeamTasksParams,
+  ) {
+    return this.request<GetFilteredTeamTasksResponse>(`/team/${team_id}/task`, {
+      method: "GET",
+      query: {
+        page: params?.page,
+        order_by: params?.order_by,
+        reverse: params?.reverse,
+        subtasks: params?.subtasks,
+        space_ids: params?.space_ids,
+        project_ids: params?.project_ids,
+        list_ids: params?.list_ids,
+        statuses: params?.statuses,
+        include_closed: params?.include_closed,
+        assignees: params?.assignees,
+        tags: params?.tags,
+        due_date_gt: params?.due_date_gt,
+        due_date_lt: params?.due_date_lt,
+        date_created_gt: params?.date_created_gt,
+        date_created_lt: params?.date_created_lt,
+        date_updated_gt: params?.date_updated_gt,
+        date_updated_lt: params?.date_updated_lt,
+        date_done_gt: params?.date_done_gt,
+        date_done_lt: params?.date_done_lt,
+        custom_fields: params?.custom_fields,
+        parent: params?.parent,
+        include_markdown_description: params?.include_markdown_description,
+        custom_items: params?.custom_items,
+      },
+    });
+  }
 
-/**
- * Merge Tasks
- *
- * @description merges one or more source tasks into a target task
- * @param task_id as the id of the target task
- * @param params source task ids to merge into the target task
- * @returns Nothing when the tasks are merged successfully
- * @see https://developer.clickup.com/reference/mergetasks
- */
-public async mergeTasks(
-  task_id: string,
-  params: MergeTasksParams
-) {
-  return this.request<void>(
-    `/task/${task_id}/merge`,
-    {
+  /**
+   * Merge Tasks
+   *
+   * @description merges one or more source tasks into a target task
+   * @param task_id as the id of the target task
+   * @param params source task ids to merge into the target task
+   * @returns Nothing when the tasks are merged successfully
+   * @see https://developer.clickup.com/reference/mergetasks
+   */
+  public async mergeTasks(task_id: string, params: MergeTasksParams) {
+    return this.request<void>(`/task/${task_id}/merge`, {
       method: "POST",
       body: {
         source_task_ids: params.source_task_ids,
       },
-    }
-  );
-}
+    });
+  }
 
-/**
- * Get Task's Time in Status
- *
- * @description returns how long a task has spent in each status
- * @param task_id as the id of the task
- * @param params optional parameters for custom task IDs
- * @returns Time spent in the current and previous statuses
- * @see https://developer.clickup.com/reference/gettaskstimeinstatus
- */
-public async getTaskTimeInStatus(
-  task_id: string,
-  params?: GetTaskTimeInStatusParams
-) {
-  return this.request<GetTaskTimeInStatusResponse>(
-    `/task/${task_id}/time_in_status`,
-    {
-      method: "GET",
-      query: {
-        custom_task_ids: params?.custom_task_ids,
-        team_id: params?.team_id,
+  /**
+   * Get Task's Time in Status
+   *
+   * @description returns how long a task has spent in each status
+   * @param task_id as the id of the task
+   * @param params optional parameters for custom task IDs
+   * @returns Time spent in the current and previous statuses
+   * @see https://developer.clickup.com/reference/gettaskstimeinstatus
+   */
+  public async getTaskTimeInStatus(
+    task_id: string,
+    params?: GetTaskTimeInStatusParams,
+  ) {
+    return this.request<GetTaskTimeInStatusResponse>(
+      `/task/${task_id}/time_in_status`,
+      {
+        method: "GET",
+        query: {
+          custom_task_ids: params?.custom_task_ids,
+          team_id: params?.team_id,
+        },
       },
-    }
-  );
-}
-/**
- * Get Bulk Tasks' Time in Status
- *
- * @description returns how long multiple tasks have spent in each status
- * @param params task ids and optional custom task id parameters
- * @returns Time in status information keyed by task id
- * @see https://developer.clickup.com/reference/getbulktaskstimeinstatus
- */
-public async getBulkTasksTimeInStatus(
-  params: GetBulkTasksTimeInStatusParams
-) {
-  return this.request<GetBulkTasksTimeInStatusResponse>(
-    "/task/bulk_time_in_status/task_ids",
-    {
-      method: "GET",
-      query: {
-        task_ids: params.task_ids,
-        custom_task_ids: params.custom_task_ids,
-        team_id: params.team_id,
+    );
+  }
+  /**
+   * Get Bulk Tasks' Time in Status
+   *
+   * @description returns how long multiple tasks have spent in each status
+   * @param params task ids and optional custom task id parameters
+   * @returns Time in status information keyed by task id
+   * @see https://developer.clickup.com/reference/getbulktaskstimeinstatus
+   */
+  public async getBulkTasksTimeInStatus(
+    params: GetBulkTasksTimeInStatusParams,
+  ) {
+    return this.request<GetBulkTasksTimeInStatusResponse>(
+      "/task/bulk_time_in_status/task_ids",
+      {
+        method: "GET",
+        query: {
+          task_ids: params.task_ids,
+          custom_task_ids: params.custom_task_ids,
+          team_id: params.team_id,
+        },
       },
-    }
-  );
-}
+    );
+  }
 
-/**
- * Create Task From Template
- *
- * @description creates a new task from an existing task template
- * @param list_id as the id of the list to create the task in
- * @param template_id as the id of the task template
- * @param params task creation parameters
- * @returns Created task template response
- * @see https://developer.clickup.com/reference/createtaskfromtemplate
- */
-public async createTaskFromTemplate(
-  list_id: string,
-  template_id: string,
-  params: CreateTaskFromTemplateParams
-) {
-  return this.request<CreateTaskFromTemplateResponse>(
-    `/list/${list_id}/taskTemplate/${template_id}`,
-    {
-      method: "POST",
-      body: {
-        name: params.name,
+  /**
+   * Create Task From Template
+   *
+   * @description creates a new task from an existing task template
+   * @param list_id as the id of the list to create the task in
+   * @param template_id as the id of the task template
+   * @param params task creation parameters
+   * @returns Created task template response
+   * @see https://developer.clickup.com/reference/createtaskfromtemplate
+   */
+  public async createTaskFromTemplate(
+    list_id: string,
+    template_id: string,
+    params: CreateTaskFromTemplateParams,
+  ) {
+    return this.request<CreateTaskFromTemplateResponse>(
+      `/list/${list_id}/taskTemplate/${template_id}`,
+      {
+        method: "POST",
+        body: {
+          name: params.name,
+        },
       },
-    }
-  );
-}
-
+    );
+  }
 
   /**
    * Add a dependency between tasks

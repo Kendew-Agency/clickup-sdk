@@ -104,8 +104,6 @@ export type RemoveCustomFieldValueParams = {
   team_id?: number;
 };
 
-
-
 // Response Types
 export type GetListCustomFieldsResponse = {
   fields: CustomField[];
