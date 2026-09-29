@@ -1,3 +1,5 @@
+import type { ReferenceByCustomTaskId } from "../../types/clickup.types";
+
 // Tag structure
 type Tag = {
   name: string;
@@ -34,13 +36,7 @@ export type UpdateSpaceTagParams = {
 export type UpdateSpaceTagResponse = Tag;
 
 // Add tag to task
-export type AddTagToTaskParams = {
-  custom_task_ids?: boolean;
-  team_id?: number;
-};
+export type AddTagToTaskParams = ReferenceByCustomTaskId;
 
 // Remove tag from task
-export type RemoveTagFromTaskParams = {
-  custom_task_ids?: boolean;
-  team_id?: number;
-};
+export type RemoveTagFromTaskParams = ReferenceByCustomTaskId;
