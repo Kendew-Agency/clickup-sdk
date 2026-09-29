@@ -47,6 +47,7 @@ export class Tasks extends Base {
         include_closed: params?.include_closed,
         include_timl: params?.include_timl,
         assignees: params?.assignees,
+        watchers: params?.watchers,
         tags: params?.tags,
         due_date_gt: params?.due_date_gt,
         due_date_lt: params?.due_date_lt,

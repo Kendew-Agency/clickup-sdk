@@ -96,6 +96,7 @@ export type GetTasksParams = {
   include_closed?: boolean;
   include_timl?: boolean;
   assignees?: number[];
+  watchers?: string[];
   tags?: string[];
   due_date_gt?: number;
   due_date_lt?: number;
