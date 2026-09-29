@@ -108,3 +108,21 @@ export type UpdateGoalParams = {
 export type UpdateGoalResponse = {
   goal: Goal;
 };
+
+// Create key result
+export type CreateKeyResultParams = {
+  name: string;
+  owners: number[];
+  type: "number" | "currency" | "boolean" | "percentage" | "automatic";
+  steps_start: number;
+  steps_end: number;
+  unit: string;
+  task_ids: string[];
+  list_ids: string[];
+};
+
+// Edit key result
+export type EditKeyResultParams = Partial<CreateKeyResultParams> & {
+  steps_current?: number;
+  note?: string;
+};

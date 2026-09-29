@@ -1,8 +1,8 @@
-import type { CreateTaskAttachemntResponse } from "../methods/attachments/types";
+import type { CreateTaskAttachmentResponse } from "../methods/attachments/types";
 import type { CommentAttachmentElement } from "../methods/comments/types";
 
 export function buildAttachmentElement(
-  response: CreateTaskAttachemntResponse,
+  response: CreateTaskAttachmentResponse,
 ): CommentAttachmentElement {
   const attachmentData = {
     id: response.id,

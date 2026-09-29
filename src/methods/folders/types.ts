@@ -79,3 +79,20 @@ export type UpdateFolderParams = {
 };
 
 export type UpdateFolderResponse = Folder;
+
+// Create folder from template
+export type CreateFolderFromTemplateParams = {
+  name: string;
+  parent_folder_id?: string;
+  options?: object;
+};
+
+export type CreateFolderFromTemplateResponse = object;
+
+// Move folder
+export type MoveFolderParams = {
+  parent_folder_id?: string;
+  space_id?: string;
+  position?: number;
+  custom_type_map?: Record<string, number>;
+};

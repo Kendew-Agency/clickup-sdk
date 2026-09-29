@@ -1,7 +1,7 @@
-export type CreateTaskAttachemntParams = CreateTaskAttachemntParamsBase &
-  CreateTaskAttachemntParamsConditional;
+export type CreateTaskAttachmentParams = CreateTaskAttachmentParamsBase &
+  CreateTaskAttachmentParamsConditional;
 
-type CreateTaskAttachemntParamsBase = {
+type CreateTaskAttachmentParamsBase = {
   /**
    * The attachment to upload.
    * @description this differs from the documentation. Yet attachment `array` is not the correct type.
@@ -9,7 +9,7 @@ type CreateTaskAttachemntParamsBase = {
   attachment: File;
 };
 
-type CreateTaskAttachemntParamsConditional =
+type CreateTaskAttachmentParamsConditional =
   | {
       custom_task_ids: true;
       team_id: number;
@@ -19,7 +19,7 @@ type CreateTaskAttachemntParamsConditional =
       team_id?: number;
     };
 
-export type CreateTaskAttachemntResponse = {
+export type CreateTaskAttachmentResponse = {
   id: string;
   version: string;
   date: number;
