@@ -109,6 +109,10 @@ export type UpdateGoalResponse = {
   goal: Goal;
 };
 
+export type DeleteGoalParams = {
+  goal_id: string;
+};
+
 export type DeleteKeyResultParams = {
   key_result_id: string;
 };

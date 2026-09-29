@@ -3,6 +3,7 @@ import type {
   CreateGoalParams,
   CreateGoalResponse,
   CreateKeyResultParams,
+  DeleteGoalParams,
   DeleteKeyResultParams,
   EditKeyResultParams,
   GetGoalResponse,
@@ -86,18 +87,31 @@ export class Goals extends Base {
     });
   }
 
-  /**
-   * Delete a goal
-   *
-   * @description deletes a goal from the workspace
-   * @param goal_id as the id of the goal to delete
-   * @see https://developer.clickup.com/reference/deletegoal
-   */
-  public async deleteKeyResult(params: DeleteKeyResultParams) {
-    return this.request<void>(`/key_result/${params.key_result_id}`, {
-      method: "DELETE",
-    });
-  }
+/**
+ * Delete a goal
+ *
+ * @description deletes a goal from the workspace
+ * @param goal_id as the id of the goal to delete
+ * @see https://developer.clickup.com/reference/deletegoal
+ */
+public async deleteGoal(params: DeleteGoalParams) {
+  return this.request<void>(`/goal/${params.goal_id}`, {
+    method: "DELETE",
+  });
+}
+
+/**
+ * Delete a key result
+ *
+ * @description deletes a key result from a goal
+ * @param params key result deletion parameters
+ * @see https://developer.clickup.com/reference/deletekeyresult
+ */
+public async deleteKeyResult(params: DeleteKeyResultParams) {
+  return this.request<void>(`/key_result/${params.key_result_id}`, {
+    method: "DELETE",
+  });
+}
 
   /**
    * Create Key Result
