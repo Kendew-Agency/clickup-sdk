@@ -173,8 +173,8 @@ export type UpdateTaskParams = ReferenceByCustomTaskId & {
   start_date_time?: boolean;
   points?: number;
   assignees?: {
-    add?: number[];
-    rem?: number[];
+    add: number[];
+    rem: number[];
   };
   group_assignees?: {
     add?: string[];
@@ -237,10 +237,7 @@ export type MergeTasksParams = {
 };
 
 // Time in status
-export type GetTaskTimeInStatusParams = {
-  custom_task_ids?: boolean;
-  team_id?: number;
-};
+export type GetTaskTimeInStatusParams = ReferenceByCustomTaskId;
 
 export type GetTaskTimeInStatusResponse = {
   current_status: {
