@@ -118,10 +118,44 @@ export type UpdateListParams = {
 
 export type UpdateListResponse = List;
 
+// List template options
+export type ListTemplateOptions = {
+  return_immediately?: boolean;
+  content?: string;
+  time_estimate?: number;
+  automation?: boolean;
+  include_views?: boolean;
+  old_due_date?: boolean;
+  old_start_date?: boolean;
+  old_followers?: boolean;
+  comment_attachments?: boolean;
+  recur_settings?: boolean;
+  old_tags?: boolean;
+  old_statuses?: boolean;
+  subtasks?: boolean;
+  custom_type?: boolean;
+  old_assignees?: boolean;
+  attachments?: boolean;
+  comment?: boolean;
+  old_status?: boolean;
+  external_dependencies?: boolean;
+  internal_dependencies?: boolean;
+  priority?: boolean;
+  custom_fields?: boolean;
+  old_checklists?: boolean;
+  relationships?: boolean;
+  old_subtask_assignees?: boolean;
+  start_date?: string;
+  due_date?: string;
+  remap_start_date?: boolean;
+  skip_weekends?: boolean;
+  archived?: 1 | 2 | null;
+};
+
 // Create list from template in folder
 export type CreateListFromTemplateParams = {
   name: string;
-  options?: object;
+  options?: ListTemplateOptions;
 };
 
 export type CreateListFromTemplateInFolderResponse = {
@@ -131,7 +165,7 @@ export type CreateListFromTemplateInFolderResponse = {
 // Create list from template in space
 export type CreateListFromTemplateInSpaceParams = {
   name: string;
-  options?: object;
+  options?: ListTemplateOptions;
 };
 
 export type CreateListFromTemplateInSpaceResponse = {
