@@ -2,6 +2,8 @@ import { Base } from "../base";
 import type {
   CreateGoalParams,
   CreateGoalResponse,
+  CreateKeyResultParams,
+  EditKeyResultParams,
   GetGoalResponse,
   GetGoalsResponse,
   UpdateGoalParams,
@@ -93,6 +95,72 @@ export class Goals extends Base {
   public async deleteGoal(goal_id: string) {
     return this.request<void>(`/goal/${goal_id}`, {
       method: "DELETE",
+    });
+  }
+
+  /**
+   * Delete a key result
+   *
+   * @description deletes a key result from a goal
+   * @param params key result deletion parameters
+   * @see https://developer.clickup.com/reference/deletekeyresult
+   */
+  public async deleteKeyResult(key_result_id: string) {
+    return this.request<void>(`/key_result/${key_result_id}`, {
+      method: "DELETE",
+    });
+  }
+
+  /**
+   * Create Key Result
+   *
+   * @description adds a key result (target) to a goal
+   * @param goal_id as the id of the goal
+   * @param params key result creation parameters
+   * @see https://developer.clickup.com/reference/createkeyresult
+   */
+  public async createKeyResult(goal_id: string, params: CreateKeyResultParams) {
+    return this.request<void>(`/goal/${goal_id}/key_result`, {
+      method: "POST",
+      body: {
+        name: params.name,
+        owners: params.owners,
+        type: params.type,
+        steps_start: params.steps_start,
+        steps_end: params.steps_end,
+        unit: params.unit,
+        task_ids: params.task_ids,
+        list_ids: params.list_ids,
+      },
+    });
+  }
+
+  /**
+   * Edit Key Result
+   *
+   * @description updates an existing key result
+   * @param key_result_id as the id of the key result
+   * @param params key result update parameters
+   * @see https://developer.clickup.com/reference/editkeyresult
+   */
+  public async editKeyResult(
+    key_result_id: string,
+    params: EditKeyResultParams,
+  ) {
+    return this.request<void>(`/key_result/${key_result_id}`, {
+      method: "PUT",
+      body: {
+        name: params.name,
+        owners: params.owners,
+        type: params.type,
+        steps_start: params.steps_start,
+        steps_end: params.steps_end,
+        unit: params.unit,
+        task_ids: params.task_ids,
+        list_ids: params.list_ids,
+        steps_current: params.steps_current,
+        note: params.note,
+      },
     });
   }
 }
