@@ -1051,3 +1051,540 @@ describe("Tasks - deleteTaskLink", () => {
     expect(result.error?.statusCode).toBe(404);
   });
 });
+
+describe("Tasks - getFilteredTeamTasks", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const tasks = new Tasks(config);
+
+  it("should construct correct endpoint with team_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ tasks: [] }),
+      } as Response;
+    };
+
+    await tasks.getFilteredTeamTasks("team_123");
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/team/team_123/task",
+    );
+  });
+
+  it("should use GET HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ tasks: [] }),
+      } as Response;
+    };
+
+    await tasks.getFilteredTeamTasks("team_123");
+
+    expect(capturedMethod).toBe("GET");
+  });
+
+  it("should include optional query params in query string", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ tasks: [] }),
+      } as Response;
+    };
+
+    await tasks.getFilteredTeamTasks("team_123", {
+      page: 1,
+      order_by: "created",
+      reverse: true,
+      subtasks: true,
+      space_ids: ["space_1", "space_2"],
+      statuses: ["open"],
+      include_closed: false,
+      assignees: ["123"],
+      tags: ["urgent"],
+      due_date_gt: 1704067200000,
+      due_date_lt: 1704153600000,
+    });
+
+    expect(capturedUrl).toContain("page=1");
+    expect(capturedUrl).toContain("order_by=created");
+    expect(capturedUrl).toContain("reverse=true");
+    expect(capturedUrl).toContain("subtasks=true");
+    expect(capturedUrl).toContain("include_closed=false");
+    expect(capturedUrl).toContain("due_date_gt=1704067200000");
+    expect(capturedUrl).toContain("due_date_lt=1704153600000");
+  });
+
+  it("should handle successful response", async () => {
+    const mockData = {
+      tasks: [
+        {
+          id: "task_123",
+          name: "Filtered Task",
+          status: { status: "open" },
+        },
+      ],
+    };
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(mockData),
+      }) as Response;
+
+    const result = await tasks.getFilteredTeamTasks("team_123");
+
+    expect(result.data).toEqual(mockData);
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        json: async () => ({ message: "Team not found" }),
+      }) as Response;
+
+    const result = await tasks.getFilteredTeamTasks("team_999");
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(404);
+  });
+});
+
+describe("Tasks - mergeTasks", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const tasks = new Tasks(config);
+
+  it("should construct correct endpoint with task_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.mergeTasks("task_123", {
+      source_task_ids: ["task_456", "task_789"],
+    });
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/task/task_123/merge",
+    );
+  });
+
+  it("should use POST HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.mergeTasks("task_123", {
+      source_task_ids: ["task_456"],
+    });
+
+    expect(capturedMethod).toBe("POST");
+  });
+
+  it("should include request body with source_task_ids", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.mergeTasks("task_123", {
+      source_task_ids: ["task_456", "task_789"],
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.source_task_ids).toEqual(["task_456", "task_789"]);
+  });
+
+  it("should handle successful response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      }) as Response;
+
+    const result = await tasks.mergeTasks("task_123", {
+      source_task_ids: ["task_456"],
+    });
+
+    expect(result.data).toEqual({});
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+        json: async () => ({ message: "Invalid source tasks" }),
+      }) as Response;
+
+    const result = await tasks.mergeTasks("task_123", {
+      source_task_ids: ["task_999"],
+    });
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(400);
+  });
+});
+
+describe("Tasks - getTaskTimeInStatus", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const tasks = new Tasks(config);
+
+  it("should construct correct endpoint with task_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.getTaskTimeInStatus("task_123");
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/task/task_123/time_in_status",
+    );
+  });
+
+  it("should use GET HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.getTaskTimeInStatus("task_123");
+
+    expect(capturedMethod).toBe("GET");
+  });
+
+  it("should include query params for custom task IDs", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.getTaskTimeInStatus("task_123", {
+      custom_task_ids: true,
+      team_id: 789,
+    });
+
+    expect(capturedUrl).toContain("custom_task_ids=true");
+    expect(capturedUrl).toContain("team_id=789");
+  });
+
+  it("should handle successful response", async () => {
+    const mockData = {
+      current_status: {
+        status: "in progress",
+        color: "#4194f6",
+        total_time: { by_minute: 120, since: "1704067200000" },
+      },
+      status_history: [],
+    };
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(mockData),
+      }) as Response;
+
+    const result = await tasks.getTaskTimeInStatus("task_123");
+
+    expect(result.data).toEqual(mockData);
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        json: async () => ({ message: "Task not found" }),
+      }) as Response;
+
+    const result = await tasks.getTaskTimeInStatus("task_999");
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(404);
+  });
+});
+
+describe("Tasks - getBulkTasksTimeInStatus", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const tasks = new Tasks(config);
+
+  it("should construct correct endpoint", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.getBulkTasksTimeInStatus({
+      task_ids: ["task_123", "task_456"],
+    });
+
+    expect(capturedUrl).toContain(
+      "https://api.clickup.com/api/v2/task/bulk_time_in_status/task_ids",
+    );
+  });
+
+  it("should use GET HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.getBulkTasksTimeInStatus({
+      task_ids: ["task_123"],
+    });
+
+    expect(capturedMethod).toBe("GET");
+  });
+
+  it("should include task_ids and custom task ID query params", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.getBulkTasksTimeInStatus({
+      task_ids: ["task_123", "task_456"],
+      custom_task_ids: true,
+      team_id: 789,
+    });
+
+    expect(capturedUrl).toContain("task_ids%5B%5D=task_123");
+    expect(capturedUrl).toContain("task_ids%5B%5D=task_456");
+    expect(capturedUrl).toContain("custom_task_ids=true");
+    expect(capturedUrl).toContain("team_id=789");
+  });
+
+  it("should handle successful response", async () => {
+    const mockData = {
+      task_123: {
+        current_status: {
+          status: "open",
+          color: "#d3d3d3",
+          total_time: { by_minute: 60, since: "1704067200000" },
+        },
+        status_history: [],
+      },
+    };
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(mockData),
+      }) as Response;
+
+    const result = await tasks.getBulkTasksTimeInStatus({
+      task_ids: ["task_123"],
+    });
+
+    expect(result.data).toEqual(mockData);
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+        json: async () => ({ message: "Invalid task ids" }),
+      }) as Response;
+
+    const result = await tasks.getBulkTasksTimeInStatus({
+      task_ids: ["task_999"],
+    });
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(400);
+  });
+});
+
+describe("Tasks - createTaskFromTemplate", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const tasks = new Tasks(config);
+
+  it("should construct correct endpoint with list_id and template_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.createTaskFromTemplate("list_123", "template_456", {
+      name: "New Task",
+    });
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/list/list_123/taskTemplate/template_456",
+    );
+  });
+
+  it("should use POST HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.createTaskFromTemplate("list_123", "template_456", {
+      name: "New Task",
+    });
+
+    expect(capturedMethod).toBe("POST");
+  });
+
+  it("should include request body with task name", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tasks.createTaskFromTemplate("list_123", "template_456", {
+      name: "Task From Template",
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.name).toBe("Task From Template");
+  });
+
+  it("should handle successful response", async () => {
+    const mockData = { id: "task_new", name: "Task From Template" };
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(mockData),
+      }) as Response;
+
+    const result = await tasks.createTaskFromTemplate(
+      "list_123",
+      "template_456",
+      { name: "Task From Template" },
+    );
+
+    expect(result.data).toEqual(mockData);
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        json: async () => ({ message: "Template not found" }),
+      }) as Response;
+
+    const result = await tasks.createTaskFromTemplate(
+      "list_123",
+      "template_999",
+      { name: "New Task" },
+    );
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(404);
+  });
+});

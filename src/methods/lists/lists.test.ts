@@ -1053,3 +1053,221 @@ describe("Lists - removeTaskFromList", () => {
     expect(result.error?.statusCode).toBe(403);
   });
 });
+
+describe("Lists - createListFromTemplate", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const lists = new Lists(config);
+
+  it("should construct correct endpoint with folder_id and template_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "list_new" }),
+      } as Response;
+    };
+
+    await lists.createListFromTemplate("folder_123", "template_456", {
+      name: "New List",
+    });
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/folder/folder_123/list_template/template_456",
+    );
+  });
+
+  it("should use POST HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "list_new" }),
+      } as Response;
+    };
+
+    await lists.createListFromTemplate("folder_123", "template_456", {
+      name: "New List",
+    });
+
+    expect(capturedMethod).toBe("POST");
+  });
+
+  it("should include request body with list parameters", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "list_new" }),
+      } as Response;
+    };
+
+    await lists.createListFromTemplate("folder_123", "template_456", {
+      name: "List From Template",
+      options: { return_immediately: true },
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.name).toBe("List From Template");
+    expect(body.options).toEqual({ return_immediately: true });
+  });
+
+  it("should handle successful response", async () => {
+    const mockData = { id: "list_new" };
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(mockData),
+      }) as Response;
+
+    const result = await lists.createListFromTemplate(
+      "folder_123",
+      "template_456",
+      { name: "List From Template" },
+    );
+
+    expect(result.data).toEqual(mockData);
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        json: async () => ({ message: "Template not found" }),
+      }) as Response;
+
+    const result = await lists.createListFromTemplate(
+      "folder_123",
+      "template_999",
+      { name: "New List" },
+    );
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(404);
+  });
+});
+
+describe("Lists - createListFromTemplateInSpace", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const lists = new Lists(config);
+
+  it("should construct correct endpoint with space_id and template_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "list_new" }),
+      } as Response;
+    };
+
+    await lists.createListFromTemplateInSpace("space_123", "template_456", {
+      name: "New List",
+    });
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/space/space_123/list_template/template_456",
+    );
+  });
+
+  it("should use POST HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "list_new" }),
+      } as Response;
+    };
+
+    await lists.createListFromTemplateInSpace("space_123", "template_456", {
+      name: "New List",
+    });
+
+    expect(capturedMethod).toBe("POST");
+  });
+
+  it("should include request body with list parameters", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "list_new" }),
+      } as Response;
+    };
+
+    await lists.createListFromTemplateInSpace("space_123", "template_456", {
+      name: "List From Template",
+      options: { return_immediately: true },
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.name).toBe("List From Template");
+    expect(body.options).toEqual({ return_immediately: true });
+  });
+
+  it("should handle successful response", async () => {
+    const mockData = { id: "list_new" };
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(mockData),
+      }) as Response;
+
+    const result = await lists.createListFromTemplateInSpace(
+      "space_123",
+      "template_456",
+      { name: "List From Template" },
+    );
+
+    expect(result.data).toEqual(mockData);
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        json: async () => ({ message: "Template not found" }),
+      }) as Response;
+
+    const result = await lists.createListFromTemplateInSpace(
+      "space_123",
+      "template_999",
+      { name: "New List" },
+    );
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(404);
+  });
+});
