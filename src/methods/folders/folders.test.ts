@@ -487,3 +487,218 @@ describe("Folders - deleteFolder", () => {
     expect(result.error?.statusCode).toBe(403);
   });
 });
+
+describe("Folders - createFolderFromTemplate", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const folders = new Folders(config);
+
+  it("should construct correct endpoint with space_id and template_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await folders.createFolderFromTemplate("space_123", "template_456", {
+      name: "New Folder",
+    });
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/space/space_123/folder_template/template_456",
+    );
+  });
+
+  it("should use POST HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await folders.createFolderFromTemplate("space_123", "template_456", {
+      name: "New Folder",
+    });
+
+    expect(capturedMethod).toBe("POST");
+  });
+
+  it("should include request body with folder parameters", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await folders.createFolderFromTemplate("space_123", "template_456", {
+      name: "Folder From Template",
+      parent_folder_id: "folder_parent",
+      options: { return_immediately: true },
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.name).toBe("Folder From Template");
+    expect(body.parent_folder_id).toBe("folder_parent");
+    expect(body.options).toEqual({ return_immediately: true });
+  });
+
+  it("should handle successful response", async () => {
+    const mockData = { id: "folder_new", name: "Folder From Template" };
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(mockData),
+      }) as Response;
+
+    const result = await folders.createFolderFromTemplate(
+      "space_123",
+      "template_456",
+      { name: "Folder From Template" },
+    );
+
+    expect(result.data).toEqual(mockData);
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        json: async () => ({ message: "Template not found" }),
+      }) as Response;
+
+    const result = await folders.createFolderFromTemplate(
+      "space_123",
+      "template_999",
+      { name: "New Folder" },
+    );
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(404);
+  });
+});
+
+describe("Folders - moveFolder", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const folders = new Folders(config);
+
+  it("should construct correct endpoint with folder_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await folders.moveFolder("folder_123", { space_id: "space_456" });
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/folder/folder_123/position",
+    );
+  });
+
+  it("should use PUT HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await folders.moveFolder("folder_123", { space_id: "space_456" });
+
+    expect(capturedMethod).toBe("PUT");
+  });
+
+  it("should include request body with move parameters", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await folders.moveFolder("folder_123", {
+      parent_folder_id: "folder_parent",
+      space_id: "space_456",
+      position: 2,
+      custom_type_map: { "1": 100 },
+    });
+
+    const body = JSON.parse(capturedBody);
+    expect(body.parent_folder_id).toBe("folder_parent");
+    expect(body.space_id).toBe("space_456");
+    expect(body.position).toBe(2);
+    expect(body.custom_type_map).toEqual({ "1": 100 });
+  });
+
+  it("should handle successful response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      }) as Response;
+
+    const result = await folders.moveFolder("folder_123", {
+      space_id: "space_456",
+    });
+
+    expect(result.data).toEqual({});
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+        json: async () => ({ message: "Invalid move parameters" }),
+      }) as Response;
+
+    const result = await folders.moveFolder("folder_999", {
+      space_id: "space_456",
+    });
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(400);
+  });
+});

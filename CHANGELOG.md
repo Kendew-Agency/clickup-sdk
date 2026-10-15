@@ -189,3 +189,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `AddTaskToListParams` and `AddTaskToListResponse` types (the endpoint has no query params and returns an empty response)
 
 [0.5.2]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.2
+
+## [0.6.0] - 2026-10-15
+
+### Added
+
+- Authorization: `getAuthorizedWorkspaces` method to list the workspaces available to the authenticated user, plus `GetAuthorizedWorkspacesResponse` type
+- Tasks: `getFilteredTeamTasks` method to query tasks across a team with filtering and pagination (`GetFilteredTeamTasksParams`, `GetFilteredTeamTasksResponse`)
+- Tasks: `mergeTasks` method to merge one or more source tasks into a target task (`MergeTasksParams`)
+- Tasks: `getTaskTimeInStatus` and `getBulkTasksTimeInStatus` methods for status-duration reporting (`GetTaskTimeInStatusParams`, `GetTaskTimeInStatusResponse`, `GetBulkTasksTimeInStatusParams`, `GetBulkTasksTimeInStatusResponse`)
+- Tasks: `createTaskFromTemplate` method to create a task from a task template (`CreateTaskFromTemplateParams`, `CreateTaskFromTemplateResponse`)
+- Tasks: `getTasks` now supports additional query params (`include_markdown_description`, `include_timl`, `watchers`, `date_done_gt`, `date_done_lt`, `custom_field`); `getTask` supports `include_markdown_description` and `custom_fields`; `updateTask` supports `custom_item_id`, `markdown_content`, `points`, `group_assignees`, and `watchers`
+- Folders: `createFolderFromTemplate` and `moveFolder` methods (`CreateFolderFromTemplateParams`, `CreateFolderFromTemplateResponse`, `MoveFolderParams`)
+- Lists: `createListFromTemplate` (in a folder) and `createListFromTemplateInSpace` methods (`CreateListFromTemplateParams`, `CreateListFromTemplateInSpaceParams`, `ListTemplateOptions`)
+- Goals: `createKeyResult`, `editKeyResult`, and `deleteKeyResult` methods (`CreateKeyResultParams`, `EditKeyResultParams`)
+- Tags: `addTagToTask` and `removeTagFromTask` methods (`AddTagToTaskParams`, `RemoveTagFromTaskParams`)
+- Custom Fields: `getFolderCustomFields`, `setCustomFieldValue`, and `removeCustomFieldValue` methods (`SetCustomFieldValueParams`, `RemoveCustomFieldValueParams`, `GetFolderCustomFieldsResponse`)
+
+### Changed
+
+- Tags: `addTagToTask` and `removeTagFromTask` now take `(task_id, tag_name, params?)` where `params` carries the optional custom task ID fields, matching the ClickUp endpoint
+- Spaces: `CreateSpaceParams` (`multiple_assignees`, `features`) and `UpdateSpaceParams` (`name`, `color`, `private`, `admin_can_manage`, `multiple_assignees`, `features`) fields are now required
+- Authorization: `getAccessToken` now sends `client_id`, `client_secret`, and `code` as top-level body fields instead of a nested `params` object
+
+### Fixed
+
+- Attachments: `CreateTaskAttachemntParams`/`CreateTaskAttachemntResponse` typos corrected to `CreateTaskAttachmentParams`/`CreateTaskAttachmentResponse`
+
+[0.6.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.6.0

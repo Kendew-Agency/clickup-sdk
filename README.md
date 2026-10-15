@@ -115,17 +115,17 @@ const clickupWithCustomHeaders = clickup.withConfig({
 
 The following API endpoints are currently implemented in this SDK:
 
-- **Authorization**: OAuth token exchange, get authorized user
-- **Tasks**: Get, create, update, delete tasks, manage dependencies and links
+- **Authorization**: OAuth token exchange, get authorized user, get authorized workspaces
+- **Tasks**: Get, create, update, delete tasks, filtered team tasks, merge tasks, time in status, create from template, manage dependencies and links
 - **Comments**: Task, list, and chat view comments with threading and attachment support
 - **Attachments**: Upload task attachments
 - **Custom Task Types**: Get workspace custom task types
 - **Spaces**: Get, create, update, delete spaces
-- **Folders**: Get, create, update, delete folders
-- **Lists**: Get, create, update, delete lists, add tasks to lists
-- **Goals**: Get, create, update, delete goals
-- **Tags**: Get, create, update, delete tags, manage task tags
-- **Custom Fields**: Get accessible fields, set and remove values
+- **Folders**: Get, create, update, delete folders, create from template, move folders
+- **Lists**: Get, create, update, delete lists, add/remove tasks, create from template
+- **Goals**: Get, create, update, delete goals, manage key results
+- **Tags**: Get, create, update, delete tags, add/remove task tags
+- **Custom Fields**: Get list/folder/space/workspace fields, set and remove values
 
 Additional ClickUp API endpoints will be added in future releases. Contributions are welcome!
 
@@ -141,6 +141,9 @@ const token = await clickup.authorization.getAccessToken({
 
 // Get authorized user information
 const user = await clickup.authorization.getAuthorizedUser();
+
+// Get workspaces available to the authenticated user
+const workspaces = await clickup.authorization.getAuthorizedWorkspaces();
 ```
 
 ### Tasks
@@ -199,6 +202,33 @@ await clickup.tasks.addTaskLink("task_id", {
 await clickup.tasks.deleteTaskLink("task_id", {
   links_to: "other_task_id",
 });
+
+// Get tasks filtered across a whole team
+const teamTasks = await clickup.tasks.getFilteredTeamTasks("team_id", {
+  statuses: ["Open"],
+  assignees: ["123"],
+  include_closed: false,
+});
+
+// Merge one or more source tasks into a target task
+await clickup.tasks.mergeTasks("target_task_id", {
+  source_task_ids: ["source_task_1", "source_task_2"],
+});
+
+// Get how long a task has spent in each status
+const timeInStatus = await clickup.tasks.getTaskTimeInStatus("task_id");
+
+// Get time in status for multiple tasks at once
+const bulkTimeInStatus = await clickup.tasks.getBulkTasksTimeInStatus({
+  task_ids: ["task_1", "task_2"],
+});
+
+// Create a task from a task template
+const fromTemplate = await clickup.tasks.createTaskFromTemplate(
+  "list_id",
+  "template_id",
+  { name: "Task from template" },
+);
 ```
 
 ### Comments
@@ -423,6 +453,20 @@ await clickup.folders.updateFolder("folder_id", {
 
 // Delete a folder
 await clickup.folders.deleteFolder("folder_id");
+
+// Create a folder from a template within a space
+const templatedFolder = await clickup.folders.createFolderFromTemplate(
+  "space_id",
+  "template_id",
+  {
+    name: "New Folder from Template",
+  },
+);
+
+// Move a folder to another space or folder
+await clickup.folders.moveFolder("folder_id", {
+  space_id: "destination_space_id",
+});
 ```
 
 ### Lists
@@ -463,6 +507,20 @@ await clickup.lists.addTaskToList("list_id", "task_id");
 
 // Remove a task from an additional list
 await clickup.lists.removeTaskFromList("list_id", "task_id");
+
+// Create a list from a template within a folder
+const templatedList = await clickup.lists.createListFromTemplate(
+  "folder_id",
+  "template_id",
+  { name: "New List from Template" },
+);
+
+// Create a folderless list from a template within a space
+const templatedSpaceList = await clickup.lists.createListFromTemplateInSpace(
+  "space_id",
+  "template_id",
+  { name: "New Folderless List from Template" },
+);
 ```
 
 ### Goals
@@ -491,6 +549,27 @@ await clickup.goals.updateGoal("goal_id", {
 
 // Delete a goal
 await clickup.goals.deleteGoal("goal_id");
+
+// Add a key result (target) to a goal
+await clickup.goals.createKeyResult("goal_id", {
+  name: "Increase signups",
+  owners: [123],
+  type: "number",
+  steps_start: 0,
+  steps_end: 100,
+  unit: "signups",
+  task_ids: [],
+  list_ids: [],
+});
+
+// Edit an existing key result
+await clickup.goals.editKeyResult("key_result_id", {
+  steps_current: 50,
+  note: "Halfway there",
+});
+
+// Delete a key result
+await clickup.goals.deleteKeyResult("key_result_id");
 ```
 
 ### Tags
@@ -513,28 +592,43 @@ await clickup.tags.updateTag("space_id", "tag_name", {
 await clickup.tags.deleteTag("space_id", "tag_name");
 
 // Add tag to task
-await clickup.tags.addTagToTask("task_id", {
-  tag_name: "urgent",
+await clickup.tags.addTagToTask("task_id", "urgent");
+
+// Add tag to task using a custom task ID
+await clickup.tags.addTagToTask("CUSTOM-123", "urgent", {
+  custom_task_ids: true,
+  team_id: 123,
 });
 
 // Remove tag from task
-await clickup.tags.removeTagFromTask("task_id", "tag_name");
+await clickup.tags.removeTagFromTask("task_id", "urgent");
 ```
 
 ### Custom Fields
 
 ```typescript
-// Get accessible custom fields
-const customFields = await clickup.customFields.getAccessibleCustomFields(
-  "list_id",
+// Get custom fields accessible in a list
+const listFields = await clickup.customFields.getListCustomFields("list_id");
+
+// Get custom fields available in a folder
+const folderFields = await clickup.customFields.getFolderCustomFields(
+  "folder_id",
 );
 
-// Set custom field value
+// Get custom fields created at the space level
+const spaceFields = await clickup.customFields.getSpaceCustomFields("space_id");
+
+// Get custom fields created at the workspace level
+const workspaceFields = await clickup.customFields.getWorkspaceCustomFields(
+  "team_id",
+);
+
+// Set a custom field value on a task
 await clickup.customFields.setCustomFieldValue("task_id", "field_id", {
   value: "custom value",
 });
 
-// Remove custom field value
+// Remove a custom field value from a task
 await clickup.customFields.removeCustomFieldValue("task_id", "field_id");
 ```
 
