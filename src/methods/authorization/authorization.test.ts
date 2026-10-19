@@ -72,7 +72,7 @@ describe("Authorization - getAccessToken", () => {
     await authorization.getAccessToken(params);
 
     const parsedBody = JSON.parse(capturedBody);
-    expect(parsedBody.params).toEqual(params);
+    expect(parsedBody).toEqual(params);
   });
 
   it("should handle successful response", async () => {
@@ -221,5 +221,86 @@ describe("Authorization - getAuthorizedUser", () => {
     expect(result.data).toBeNull();
     expect(result.error).not.toBeNull();
     expect(result.error?.statusCode).toBe(403);
+  });
+});
+
+describe("Authorization - getAuthorizedWorkspaces", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const authorization = new Authorization(config);
+
+  it("should construct correct endpoint", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: string | URL | Request) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ teams: [] }),
+      } as Response;
+    };
+
+    await authorization.getAuthorizedWorkspaces();
+
+    expect(capturedUrl).toBe("https://api.clickup.com/api/v2/team");
+  });
+
+  it("should use GET HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: string | URL | Request,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ teams: [] }),
+      } as Response;
+    };
+
+    await authorization.getAuthorizedWorkspaces();
+
+    expect(capturedMethod).toBe("GET");
+  });
+
+  it("should handle successful response", async () => {
+    const mockData = {
+      teams: [
+        {
+          id: "team_123",
+          name: "My Workspace",
+          color: "#32a852",
+          avatar: "https://example.com/avatar.png",
+          members: [],
+        },
+      ],
+    };
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(mockData),
+      }) as Response;
+
+    const result = await authorization.getAuthorizedWorkspaces();
+
+    expect(result.data).toEqual(mockData);
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 401,
+        statusText: "Unauthorized",
+        json: async () => ({ message: "Invalid token" }),
+      }) as Response;
+
+    const result = await authorization.getAuthorizedWorkspaces();
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(401);
   });
 });

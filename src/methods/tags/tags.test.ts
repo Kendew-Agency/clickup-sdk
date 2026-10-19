@@ -444,3 +444,187 @@ describe("Tags - deleteSpaceTag", () => {
     expect(result.error?.statusCode).toBe(403);
   });
 });
+
+describe("Tags - addTagToTask", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const tags = new Tags(config);
+
+  it("should construct correct endpoint with task_id and tag_name", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tags.addTagToTask("task_123", "urgent");
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/task/task_123/tag/urgent",
+    );
+  });
+
+  it("should use POST HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tags.addTagToTask("task_123", "urgent");
+
+    expect(capturedMethod).toBe("POST");
+  });
+
+  it("should include query params for custom task IDs", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tags.addTagToTask("task_123", "urgent", {
+      custom_task_ids: true,
+      team_id: 789,
+    });
+
+    expect(capturedUrl).toContain("custom_task_ids=true");
+    expect(capturedUrl).toContain("team_id=789");
+  });
+
+  it("should handle successful response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      }) as Response;
+
+    const result = await tags.addTagToTask("task_123", "urgent");
+
+    expect(result.data).toEqual({});
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        json: async () => ({ message: "Task not found" }),
+      }) as Response;
+
+    const result = await tags.addTagToTask("task_999", "urgent");
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(404);
+  });
+});
+
+describe("Tags - removeTagFromTask", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const tags = new Tags(config);
+
+  it("should construct correct endpoint with task_id and tag_name", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tags.removeTagFromTask("task_123", "urgent");
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/task/task_123/tag/urgent",
+    );
+  });
+
+  it("should use DELETE HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tags.removeTagFromTask("task_123", "urgent");
+
+    expect(capturedMethod).toBe("DELETE");
+  });
+
+  it("should include query params for custom task IDs", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await tags.removeTagFromTask("task_123", "urgent", {
+      custom_task_ids: true,
+      team_id: 789,
+    });
+
+    expect(capturedUrl).toContain("custom_task_ids=true");
+    expect(capturedUrl).toContain("team_id=789");
+  });
+
+  it("should handle successful response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      }) as Response;
+
+    const result = await tags.removeTagFromTask("task_123", "urgent");
+
+    expect(result.data).toEqual({});
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        json: async () => ({ message: "Tag not found" }),
+      }) as Response;
+
+    const result = await tags.removeTagFromTask("task_999", "urgent");
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(404);
+  });
+});

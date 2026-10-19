@@ -511,3 +511,315 @@ describe("Goals - deleteGoal", () => {
     expect(result.error?.statusCode).toBe(403);
   });
 });
+
+describe("Goals - createKeyResult", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const goals = new Goals(config);
+
+  it("should construct correct endpoint with goal_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: string) => {
+      capturedUrl = url as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await goals.createKeyResult("goal_123", {
+      name: "Revenue",
+      owners: [123],
+      type: "number",
+      steps_start: 0,
+      steps_end: 100,
+      unit: "USD",
+      task_ids: [],
+      list_ids: [],
+    });
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/goal/goal_123/key_result",
+    );
+  });
+
+  it("should use POST HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (_url: string, options?: RequestInit) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await goals.createKeyResult("goal_123", {
+      name: "Revenue",
+      owners: [123],
+      type: "number",
+      steps_start: 0,
+      steps_end: 100,
+      unit: "USD",
+      task_ids: [],
+      list_ids: [],
+    });
+
+    expect(capturedMethod).toBe("POST");
+  });
+
+  it("should send request body with key result parameters", async () => {
+    let capturedBody: string | undefined;
+    globalThis.fetch = async (_url: string, options?: RequestInit) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    const params = {
+      name: "Revenue Target",
+      owners: [123, 456],
+      type: "currency" as const,
+      steps_start: 0,
+      steps_end: 100000,
+      unit: "USD",
+      task_ids: ["task_1"],
+      list_ids: ["list_1"],
+    };
+
+    await goals.createKeyResult("goal_123", params);
+
+    expect(capturedBody).toBeDefined();
+    const parsedBody = JSON.parse(capturedBody as string);
+    expect(parsedBody).toEqual(params);
+  });
+
+  it("should handle successful response", async () => {
+    const mockData = { key_result: { id: "kr_123" } };
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(mockData),
+      }) as Response;
+
+    const result = await goals.createKeyResult("goal_123", {
+      name: "Revenue",
+      owners: [123],
+      type: "number",
+      steps_start: 0,
+      steps_end: 100,
+      unit: "USD",
+      task_ids: [],
+      list_ids: [],
+    });
+
+    expect(result.data).toEqual(mockData);
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 400,
+        statusText: "Bad Request",
+        json: async () => ({ message: "Invalid key result" }),
+      }) as Response;
+
+    const result = await goals.createKeyResult("goal_999", {
+      name: "Revenue",
+      owners: [123],
+      type: "number",
+      steps_start: 0,
+      steps_end: 100,
+      unit: "USD",
+      task_ids: [],
+      list_ids: [],
+    });
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(400);
+  });
+});
+
+describe("Goals - editKeyResult", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const goals = new Goals(config);
+
+  it("should construct correct endpoint with key_result_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: string) => {
+      capturedUrl = url as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await goals.editKeyResult("kr_123", { steps_current: 50 });
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/key_result/kr_123",
+    );
+  });
+
+  it("should use PUT HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (_url: string, options?: RequestInit) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await goals.editKeyResult("kr_123", { steps_current: 50 });
+
+    expect(capturedMethod).toBe("PUT");
+  });
+
+  it("should send request body with update parameters", async () => {
+    let capturedBody: string | undefined;
+    globalThis.fetch = async (_url: string, options?: RequestInit) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await goals.editKeyResult("kr_123", {
+      steps_current: 75,
+      note: "On track",
+    });
+
+    expect(capturedBody).toBeDefined();
+    const parsedBody = JSON.parse(capturedBody as string);
+    expect(parsedBody.steps_current).toBe(75);
+    expect(parsedBody.note).toBe("On track");
+  });
+
+  it("should handle successful response", async () => {
+    const mockData = { key_result: { id: "kr_123" } };
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify(mockData),
+      }) as Response;
+
+    const result = await goals.editKeyResult("kr_123", { steps_current: 50 });
+
+    expect(result.data).toEqual(mockData);
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 404,
+        statusText: "Not Found",
+        json: async () => ({ message: "Key result not found" }),
+      }) as Response;
+
+    const result = await goals.editKeyResult("kr_999", { steps_current: 50 });
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(404);
+  });
+});
+
+describe("Goals - deleteKeyResult", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const goals = new Goals(config);
+
+  it("should construct correct endpoint with key_result_id", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: string) => {
+      capturedUrl = url as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => "",
+      } as Response;
+    };
+
+    await goals.deleteKeyResult("kr_123");
+
+    expect(capturedUrl).toBe(
+      "https://api.clickup.com/api/v2/key_result/kr_123",
+    );
+  });
+
+  it("should use DELETE HTTP method", async () => {
+    let capturedMethod = "";
+    globalThis.fetch = async (_url: string, options?: RequestInit) => {
+      capturedMethod = options?.method || "GET";
+      return {
+        ok: true,
+        status: 200,
+        text: async () => "",
+      } as Response;
+    };
+
+    await goals.deleteKeyResult("kr_123");
+
+    expect(capturedMethod).toBe("DELETE");
+  });
+
+  it("should not send request body", async () => {
+    let capturedBody: string | undefined;
+    globalThis.fetch = async (_url: string, options?: RequestInit) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => "",
+      } as Response;
+    };
+
+    await goals.deleteKeyResult("kr_123");
+
+    expect(capturedBody).toBeUndefined();
+  });
+
+  it("should handle successful response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: true,
+        status: 200,
+        text: async () => "",
+      }) as Response;
+
+    const result = await goals.deleteKeyResult("kr_123");
+
+    expect(result.data).toEqual({});
+    expect(result.error).toBeNull();
+  });
+
+  it("should handle error response", async () => {
+    globalThis.fetch = async () =>
+      ({
+        ok: false,
+        status: 403,
+        statusText: "Forbidden",
+        json: async () => ({ message: "Cannot delete key result" }),
+      }) as Response;
+
+    const result = await goals.deleteKeyResult("kr_999");
+
+    expect(result.data).toBeNull();
+    expect(result.error).not.toBeNull();
+    expect(result.error?.statusCode).toBe(403);
+  });
+});
