@@ -20,18 +20,78 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - **Breaking:** `setCustomFieldValue` params are now `CustomFieldValueInput` plus `custom_task_ids` and `team_id`. You must pass `type`, and `value` must match it. `type` is not sent to the API.
-- **Breaking:** `createTask` `custom_fields` entries are now `{ id } & CustomFieldValueInput`. `type` is not sent to the API.
-- **Breaking:** `CustomFieldFilter` and `FilterOperatorOptions` now enforce the value shape per operator instead of `unknown`.
+
+  **Before:**
+
+  ```typescript
+  await clickup.customFields.setCustomFieldValue("task-id", "field-id", {
+    value: "Some text",
+  });
+
+  await clickup.customFields.setCustomFieldValue("task-id", "date-field-id", {
+    value: 1767225600000,
+    value_options: { time: true },
+  });
+  ```
+
+  **After:**
+
+  ```typescript
+  await clickup.customFields.setCustomFieldValue("task-id", "field-id", {
+    type: "short_text",
+    value: "Some text",
+  });
+
+  await clickup.customFields.setCustomFieldValue("task-id", "date-field-id", {
+    type: "date",
+    value: 1767225600000,
+    value_options: { time: true },
+  });
+  ```
+
+- **Breaking:** `createTask` `custom_fields` entries are now `{ id } & CustomFieldValueInput`. You must pass `type`, and `value` must match it. `type` is not sent to the API.
+
+  **Before:**
+
+  ```typescript
+  await clickup.tasks.createTask("list-id", {
+    name: "New task",
+    custom_fields: [{ id: "field-id", value: "Some text" }],
+  });
+  ```
+
+  **After:**
+
+  ```typescript
+  await clickup.tasks.createTask("list-id", {
+    name: "New task",
+    custom_fields: [{ id: "field-id", type: "short_text", value: "Some text" }],
+  });
+  ```
+
 - **Breaking:** `GetFilteredTeamTasksParams.custom_fields` is now a `string` (use `serializeCustomFieldFilters`) instead of `string[]`.
+
+  **Before:**
+
+  ```typescript
+  await clickup.tasks.getFilteredTeamTasks("team-id", {
+    custom_fields: ['{"field_id":"field-id","operator":"=","value":"foo"}'],
+  });
+  ```
+
+  **After:**
+
+  ```typescript
+  import { cf, serializeCustomFieldFilters } from "@kendew-agency/clickup-sdk";
+
+  await clickup.tasks.getFilteredTeamTasks("team-id", {
+    custom_fields: serializeCustomFieldFilters([cf.eq("field-id", "foo")]),
+  });
+  ```
+
 - `GetTaskParams.custom_fields` is now optional.
 - `retrieveCustomFieldValue` TSDoc completed with a working example.
 - `long_text` is marked `@deprecated` in favor of `text`.
-
-### Removed
-
-- **Breaking:** `constructCustomFieldFilters`, replaced by `cf` and `serializeCustomFieldFilters`.
-- **Breaking:** the unused `CustomFieldValueType` type.
-- **Breaking:** `automatic_progress` and the untyped `{}` member are no longer accepted as custom field values.
 
 [0.7.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.7.0
 
