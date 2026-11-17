@@ -5,6 +5,181 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.7.0] - 2026-11-17
+
+### Added
+
+- `CustomFieldValueInput`: a discriminated union keyed by `type`, so each custom field type only accepts a matching `value` (and `value_options` for `date`). Also exports `SettableCustomFieldType` and `AddRemoveValue`.
+- `text` and `tasks` added to `CustomFieldType`.
+- `cf` filter builder (`eq`, `exact`, `neq`, `notExact`, `lt`, `lte`, `gt`, `gte`, `range`, `any`, `all`, `notAny`, `notAll`, `isNull`, `isNotNull`) for typed custom field filters.
+- `serializeCustomFieldFilters` to turn filters into the JSON string for the `custom_fields` query parameter.
+- `toCustomFieldBody` helper that builds the request body for a custom field value.
+- `TaskCustomFieldInput` type for `custom_fields` in `createTask`.
+- Property-based tests (fast-check), unit tests and compile-time type tests for the above. `pnpm typecheck` now uses `tsconfig.typecheck.json`.
+
+### Changed
+
+- **Breaking:** `setCustomFieldValue` params are now `CustomFieldValueInput` plus `custom_task_ids` and `team_id`. You must pass `type`, and `value` must match it. `type` is not sent to the API.
+- **Breaking:** `createTask` `custom_fields` entries are now `{ id } & CustomFieldValueInput`. `type` is not sent to the API.
+- **Breaking:** `CustomFieldFilter` and `FilterOperatorOptions` now enforce the value shape per operator instead of `unknown`.
+- **Breaking:** `GetFilteredTeamTasksParams.custom_fields` is now a `string` (use `serializeCustomFieldFilters`) instead of `string[]`.
+- `GetTaskParams.custom_fields` is now optional.
+- `retrieveCustomFieldValue` TSDoc completed with a working example.
+- `long_text` is marked `@deprecated` in favor of `text`.
+
+### Removed
+
+- **Breaking:** `constructCustomFieldFilters`, replaced by `cf` and `serializeCustomFieldFilters`.
+- **Breaking:** the unused `CustomFieldValueType` type.
+- **Breaking:** `automatic_progress` and the untyped `{}` member are no longer accepted as custom field values.
+
+[0.7.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.7.0
+
+## [0.6.0] - 2026-10-15
+
+### Added
+
+- Authorization: `getAuthorizedWorkspaces` method to list the workspaces available to the authenticated user, plus `GetAuthorizedWorkspacesResponse` type
+- Tasks: `getFilteredTeamTasks` method to query tasks across a team with filtering and pagination (`GetFilteredTeamTasksParams`, `GetFilteredTeamTasksResponse`)
+- Tasks: `mergeTasks` method to merge one or more source tasks into a target task (`MergeTasksParams`)
+- Tasks: `getTaskTimeInStatus` and `getBulkTasksTimeInStatus` methods for status-duration reporting (`GetTaskTimeInStatusParams`, `GetTaskTimeInStatusResponse`, `GetBulkTasksTimeInStatusParams`, `GetBulkTasksTimeInStatusResponse`)
+- Tasks: `createTaskFromTemplate` method to create a task from a task template (`CreateTaskFromTemplateParams`, `CreateTaskFromTemplateResponse`)
+- Tasks: `getTasks` now supports additional query params (`include_markdown_description`, `include_timl`, `watchers`, `date_done_gt`, `date_done_lt`, `custom_field`); `getTask` supports `include_markdown_description` and `custom_fields`; `updateTask` supports `custom_item_id`, `markdown_content`, `points`, `group_assignees`, and `watchers`
+- Folders: `createFolderFromTemplate` and `moveFolder` methods (`CreateFolderFromTemplateParams`, `CreateFolderFromTemplateResponse`, `MoveFolderParams`)
+- Lists: `createListFromTemplate` (in a folder) and `createListFromTemplateInSpace` methods (`CreateListFromTemplateParams`, `CreateListFromTemplateInSpaceParams`, `ListTemplateOptions`)
+- Goals: `createKeyResult`, `editKeyResult`, and `deleteKeyResult` methods (`CreateKeyResultParams`, `EditKeyResultParams`)
+- Tags: `addTagToTask` and `removeTagFromTask` methods (`AddTagToTaskParams`, `RemoveTagFromTaskParams`)
+- Custom Fields: `getFolderCustomFields`, `setCustomFieldValue`, and `removeCustomFieldValue` methods (`SetCustomFieldValueParams`, `RemoveCustomFieldValueParams`, `GetFolderCustomFieldsResponse`)
+
+### Changed
+
+- Tags: `addTagToTask` and `removeTagFromTask` now take `(task_id, tag_name, params?)` where `params` carries the optional custom task ID fields, matching the ClickUp endpoint
+- Spaces: `CreateSpaceParams` (`multiple_assignees`, `features`) and `UpdateSpaceParams` (`name`, `color`, `private`, `admin_can_manage`, `multiple_assignees`, `features`) fields are now required
+- Authorization: `getAccessToken` now sends `client_id`, `client_secret`, and `code` as top-level body fields instead of a nested `params` object
+
+### Fixed
+
+- Attachments: `CreateTaskAttachemntParams`/`CreateTaskAttachemntResponse` typos corrected to `CreateTaskAttachmentParams`/`CreateTaskAttachmentResponse`
+
+[0.6.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.6.0
+
+## [0.5.2] - 2026-09-18
+
+### Added
+
+- `removeTaskFromList` method on the Lists resource to remove a task from an additional list (requires the "Tasks in Multiple Lists" ClickApp). You can't remove a task from its home list.
+
+### Fixed
+
+- `addTaskToList` no longer accepts the undocumented `custom_task_ids` and `team_id` query params. [ClickUp docs](https://developer.clickup.com/reference/addtasktolist), this endpoint only takes `list_id` and `task_id` path params.
+
+### Removed
+
+- `AddTaskToListParams` and `AddTaskToListResponse` types (the endpoint has no query params and returns an empty response)
+
+[0.5.2]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.2
+
+## [0.5.1] - 2026-09-16
+
+### Added
+
+- `addTaskToList` method on the Lists resource to add an existing task to an additional list (requires the "Tasks in Multiple Lists" ClickApp). Supports custom task IDs via `custom_task_ids` and `team_id`.
+- `AddTaskToListParams` and `AddTaskToListResponse` types
+
+[0.5.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.1
+
+## [0.5.0] - 2026-07-02
+
+### Added
+
+- Formatted comments support: comment creation and update methods now accept structured `comment` arrays (rich text with bold, italic, code, links, lists, and code blocks) as an alternative to plain `comment_text`
+- `createTaskCommentWithAttachment` method to upload attachments and create a comment with them in one step (beta)
+- Type guard utilities for comment elements: `isTextElement`, `isEmoticonElement`, `isTagElement`, `isAttachmentElement`, `isImageElement`
+- `buildAttachmentElement` builder utility to construct attachment comment elements from upload responses
+- Comprehensive comment element types: `CommentTextElement`, `CommentEmoticonElement`, `CommentTagElement`, `CommentAttachmentElement`, `CommentImageElement`, `CommentGenericElement`
+- `CommentTextAttributes` and `CommentBlockAttributes` types for structured text formatting
+- `ImageData` and `AttachmentData` types for media in comments
+- `thumbnail_medium` field added to `CreateTaskAttachemntResponse`
+
+### Changed
+
+- Comment creation methods (`createTaskComment`, `createChatViewComment`, `createListComment`, `createThreadedComment`) now use a `CommentContent` discriminated union — either `comment_text` (plain) or `comment` (formatted), but not both
+- `UpdateCommentParams` fields (`assignee`, `group_assignee`, `resolved`) are now optional
+- Comment type changed from `{ text: string; attributes?: Record<string, unknown> }[]` to the typed `CommentElement[]` union
+
+[0.5.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.0
+
+## [0.4.0] - 2026-06-23
+
+### Fixed
+
+- List methods missing `markdown_content`
+
+### Added
+
+- `toUnixMillis` added as a utility to convert dates to unix time
+- `fromUnixMillis` added as a utility to convert unix time to a regular date
+
+[0.4.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.4.0
+
+## [0.3.1] - 2026-02-25
+
+### Fixed
+
+- Fetch headers now handle formdata properly
+
+[0.3.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.3.1
+
+## [0.3.0] - 2026-02-25
+
+### Changed
+
+- `createTaskAttachement` has been reworked for consitancy and functionality
+- `createTaskAttachement` has been renamed to `createTaskAttachment`
+
+### Fixed
+
+- `createTaskAttachment` now correctly handles file uploads with proper FormData construction
+
+[0.3.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.3.0
+
+## [0.2.3] - 2026-02-24
+
+### Fixed
+
+- `markdown_description` is now renamed to `markdown_content`
+
+[0.2.3]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.3
+
+## [0.2.2] - 2026-02-24
+
+### Changed
+
+- `markdown_description` is now added to the createTask interface
+
+[0.2.2]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.2
+
+## [0.2.1] - 2026-02-18
+
+### Changed
+
+- build of the query fetch url has been changed
+
+[0.2.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.1
+
+## [0.2.0] - 2026-02-18
+
+### Changed
+
+- team_id is now typed is number instead of string
+- `Bearer` has ben removed from the default authorization header
+
+### Documentation
+
+- Changed team_id to number instead of string
+
+[0.2.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.0
+
 ## [0.1.0] - 2026-02-16
 
 ### Added
@@ -72,148 +247,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Development setup instructions
 
 [0.1.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.1.0
-
-## [0.2.0] - 2026-02-18
-
-### Changed
-
-- team_id is now typed is number instead of string
-- `Bearer` has ben removed from the default authorization header
-
-### Documentation
-
-- Changed team_id to number instead of string
-
-[0.2.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.0
-
-## [0.2.1] - 2026-02-18
-
-### Changed
-
-- build of the query fetch url has been changed
-
-[0.2.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.1
-
-## [0.2.2] - 2026-02-24
-
-### Changed
-
-- `markdown_description` is now added to the createTask interface
-
-[0.2.2]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.2
-
-## [0.2.3] - 2026-02-24
-
-### Fixed
-
-- `markdown_description` is now renamed to `markdown_content`
-
-[0.2.3]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.2.3
-
-## [0.3.0] - 2026-02-25
-
-### Changed
-
-- `createTaskAttachement` has been reworked for consitancy and functionality
-- `createTaskAttachement` has been renamed to `createTaskAttachment`
-
-### Fixed
-
-- `createTaskAttachment` now correctly handles file uploads with proper FormData construction
-
-[0.3.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.3.0
-
-## [0.3.1] - 2026-02-25
-
-### Fixed
-
-- Fetch headers now handle formdata properly
-
-[0.3.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.3.1
-
-## [0.4.0] - 2026-06-23
-
-### Fixed
-
-- List methods missing `markdown_content`
-
-### Added
-
-- `toUnixMillis` added as a utility to convert dates to unix time
-- `fromUnixMillis` added as a utility to convert unix time to a regular date
-
-[0.4.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.4.0
-
-## [0.5.0] - 2026-07-02
-
-### Added
-
-- Formatted comments support: comment creation and update methods now accept structured `comment` arrays (rich text with bold, italic, code, links, lists, and code blocks) as an alternative to plain `comment_text`
-- `createTaskCommentWithAttachment` method to upload attachments and create a comment with them in one step (beta)
-- Type guard utilities for comment elements: `isTextElement`, `isEmoticonElement`, `isTagElement`, `isAttachmentElement`, `isImageElement`
-- `buildAttachmentElement` builder utility to construct attachment comment elements from upload responses
-- Comprehensive comment element types: `CommentTextElement`, `CommentEmoticonElement`, `CommentTagElement`, `CommentAttachmentElement`, `CommentImageElement`, `CommentGenericElement`
-- `CommentTextAttributes` and `CommentBlockAttributes` types for structured text formatting
-- `ImageData` and `AttachmentData` types for media in comments
-- `thumbnail_medium` field added to `CreateTaskAttachemntResponse`
-
-### Changed
-
-- Comment creation methods (`createTaskComment`, `createChatViewComment`, `createListComment`, `createThreadedComment`) now use a `CommentContent` discriminated union — either `comment_text` (plain) or `comment` (formatted), but not both
-- `UpdateCommentParams` fields (`assignee`, `group_assignee`, `resolved`) are now optional
-- Comment type changed from `{ text: string; attributes?: Record<string, unknown> }[]` to the typed `CommentElement[]` union
-
-[0.5.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.0
-
-## [0.5.1] - 2026-09-16
-
-### Added
-
-- `addTaskToList` method on the Lists resource to add an existing task to an additional list (requires the "Tasks in Multiple Lists" ClickApp). Supports custom task IDs via `custom_task_ids` and `team_id`.
-- `AddTaskToListParams` and `AddTaskToListResponse` types
-
-[0.5.1]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.1
-
-## [0.5.2] - 2026-09-18
-
-### Added
-
-- `removeTaskFromList` method on the Lists resource to remove a task from an additional list (requires the "Tasks in Multiple Lists" ClickApp). You can't remove a task from its home list.
-
-### Fixed
-
-- `addTaskToList` no longer accepts the undocumented `custom_task_ids` and `team_id` query params. [ClickUp docs](https://developer.clickup.com/reference/addtasktolist), this endpoint only takes `list_id` and `task_id` path params.
-
-### Removed
-
-- `AddTaskToListParams` and `AddTaskToListResponse` types (the endpoint has no query params and returns an empty response)
-
-[0.5.2]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.5.2
-
-## [0.6.0] - 2026-10-15
-
-### Added
-
-- Authorization: `getAuthorizedWorkspaces` method to list the workspaces available to the authenticated user, plus `GetAuthorizedWorkspacesResponse` type
-- Tasks: `getFilteredTeamTasks` method to query tasks across a team with filtering and pagination (`GetFilteredTeamTasksParams`, `GetFilteredTeamTasksResponse`)
-- Tasks: `mergeTasks` method to merge one or more source tasks into a target task (`MergeTasksParams`)
-- Tasks: `getTaskTimeInStatus` and `getBulkTasksTimeInStatus` methods for status-duration reporting (`GetTaskTimeInStatusParams`, `GetTaskTimeInStatusResponse`, `GetBulkTasksTimeInStatusParams`, `GetBulkTasksTimeInStatusResponse`)
-- Tasks: `createTaskFromTemplate` method to create a task from a task template (`CreateTaskFromTemplateParams`, `CreateTaskFromTemplateResponse`)
-- Tasks: `getTasks` now supports additional query params (`include_markdown_description`, `include_timl`, `watchers`, `date_done_gt`, `date_done_lt`, `custom_field`); `getTask` supports `include_markdown_description` and `custom_fields`; `updateTask` supports `custom_item_id`, `markdown_content`, `points`, `group_assignees`, and `watchers`
-- Folders: `createFolderFromTemplate` and `moveFolder` methods (`CreateFolderFromTemplateParams`, `CreateFolderFromTemplateResponse`, `MoveFolderParams`)
-- Lists: `createListFromTemplate` (in a folder) and `createListFromTemplateInSpace` methods (`CreateListFromTemplateParams`, `CreateListFromTemplateInSpaceParams`, `ListTemplateOptions`)
-- Goals: `createKeyResult`, `editKeyResult`, and `deleteKeyResult` methods (`CreateKeyResultParams`, `EditKeyResultParams`)
-- Tags: `addTagToTask` and `removeTagFromTask` methods (`AddTagToTaskParams`, `RemoveTagFromTaskParams`)
-- Custom Fields: `getFolderCustomFields`, `setCustomFieldValue`, and `removeCustomFieldValue` methods (`SetCustomFieldValueParams`, `RemoveCustomFieldValueParams`, `GetFolderCustomFieldsResponse`)
-
-### Changed
-
-- Tags: `addTagToTask` and `removeTagFromTask` now take `(task_id, tag_name, params?)` where `params` carries the optional custom task ID fields, matching the ClickUp endpoint
-- Spaces: `CreateSpaceParams` (`multiple_assignees`, `features`) and `UpdateSpaceParams` (`name`, `color`, `private`, `admin_can_manage`, `multiple_assignees`, `features`) fields are now required
-- Authorization: `getAccessToken` now sends `client_id`, `client_secret`, and `code` as top-level body fields instead of a nested `params` object
-
-### Fixed
-
-- Attachments: `CreateTaskAttachemntParams`/`CreateTaskAttachemntResponse` typos corrected to `CreateTaskAttachmentParams`/`CreateTaskAttachmentResponse`
-
-[0.6.0]: https://github.com/Kendew-Agency/clickup-sdk/releases/tag/v0.6.0

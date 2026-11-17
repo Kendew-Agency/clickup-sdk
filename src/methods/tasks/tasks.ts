@@ -1,3 +1,4 @@
+import { toCustomFieldBody } from "../../utils/custom-fields";
 import { Base } from "../base";
 import type {
   AddDependencyParams,
@@ -98,7 +99,13 @@ export class Tasks extends Base {
   public async createTask(list_id: string, params: CreateTaskParams) {
     return this.request<CreateTaskResponse>(`/list/${list_id}/task`, {
       method: "POST",
-      body: params,
+      body: {
+        ...params,
+        custom_fields: params.custom_fields?.map((field) => ({
+          id: field.id,
+          ...toCustomFieldBody(field),
+        })),
+      },
     });
   }
 

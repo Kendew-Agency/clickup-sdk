@@ -625,6 +625,7 @@ const workspaceFields = await clickup.customFields.getWorkspaceCustomFields(
 
 // Set a custom field value on a task
 await clickup.customFields.setCustomFieldValue("task_id", "field_id", {
+  type: "short_text",
   value: "custom value",
 });
 

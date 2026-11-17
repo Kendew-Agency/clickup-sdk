@@ -38,3 +38,24 @@ export type PaginationParams =
       start?: never;
       start_id?: never;
     };
+
+/**
+ * The exact set of operators that the `custom_fields` filter supports.
+ * @see https://developer.clickup.com/docs/taskfilters#operators
+ */
+export type FilterOperatorOptions =
+  | "="
+  | "=="
+  | "<"
+  | "<="
+  | ">"
+  | ">="
+  | "!="
+  | "!=="
+  | "IS NULL"
+  | "IS NOT NULL"
+  | "RANGE"
+  | "ANY"
+  | "ALL"
+  | "NOT ANY"
+  | "NOT ALL";
