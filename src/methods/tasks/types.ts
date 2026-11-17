@@ -1,4 +1,8 @@
 import type { ReferenceByCustomTaskId, User } from "../../types/clickup.types";
+import type {
+  CustomField,
+  CustomFieldValueInput,
+} from "../custom-fields/types";
 
 // Task User (simplified)
 type TaskUser = Pick<
@@ -49,9 +53,9 @@ export type Task = {
   points: number | null;
   time_estimate: number | null;
   time_spent: number | null;
-  custom_fields: unknown[];
-  dependencies: unknown[];
-  linked_tasks: unknown[];
+  custom_fields: CustomField[];
+  dependencies: string[];
+  linked_tasks: string[];
   team_id: string;
   url: string;
   sharing: {
@@ -122,12 +126,14 @@ export type GetTaskParams = ReferenceByCustomTaskId & {
   team_id?: number;
   include_subtasks?: boolean;
   include_markdown_description?: boolean;
-  custom_fields: string;
+  custom_fields?: string;
 };
 
 export type GetTaskResponse = Task;
 
 // Create task
+export type TaskCustomFieldInput = { id: string } & CustomFieldValueInput;
+
 export type CreateTaskParams = {
   name: string;
   description?: string;
@@ -148,10 +154,7 @@ export type CreateTaskParams = {
   links_to?: string;
   check_required_custom_fields?: boolean;
   markdown_content?: string;
-  custom_fields?: {
-    id: string;
-    value: string | number | boolean | null;
-  }[];
+  custom_fields?: TaskCustomFieldInput[];
   custom_item_id?: number;
 };
 
@@ -221,7 +224,7 @@ export type GetFilteredTeamTasksParams = {
   date_updated_lt?: number;
   date_done_gt?: number;
   date_done_lt?: number;
-  custom_fields?: string[];
+  custom_fields?: string;
   parent?: string;
   include_markdown_description?: boolean;
   custom_items?: number[];

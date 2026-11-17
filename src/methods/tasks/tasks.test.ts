@@ -288,7 +288,7 @@ describe("Tasks - createTask", () => {
       parent: "parent_task_123",
       links_to: "linked_task_456",
       check_required_custom_fields: true,
-      custom_fields: [{ id: "field_1", value: "value_1" }],
+      custom_fields: [{ id: "field_1", type: "short_text", value: "value_1" }],
     });
 
     const body = JSON.parse(capturedBody);
@@ -1586,5 +1586,152 @@ describe("Tasks - createTaskFromTemplate", () => {
     expect(result.data).toBeNull();
     expect(result.error).not.toBeNull();
     expect(result.error?.statusCode).toBe(404);
+  });
+});
+
+describe("Tasks - createTask custom_fields mapping", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const tasks = new Tasks(config);
+
+  const captureBody = () => {
+    const captured = { body: "" };
+    globalThis.fetch = async (
+      _url: RequestInfo | URL,
+      options?: RequestInit,
+    ) => {
+      captured.body = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ id: "task_123" }),
+      } as Response;
+    };
+    return captured;
+  };
+
+  it("should strip type and keep id and value for each custom field", async () => {
+    const captured = captureBody();
+
+    await tasks.createTask("list_123", {
+      name: "New Task",
+      custom_fields: [
+        { id: "f1", type: "short_text", value: "hello" },
+        { id: "f2", type: "number", value: 5 },
+        { id: "f3", type: "users", value: { add: ["1"], rem: ["2"] } },
+      ],
+    });
+
+    const body = JSON.parse(captured.body);
+    expect(body.custom_fields).toEqual([
+      { id: "f1", value: "hello" },
+      { id: "f2", value: 5 },
+      { id: "f3", value: { add: ["1"], rem: ["2"] } },
+    ]);
+  });
+
+  it("should include value_options for date fields", async () => {
+    const captured = captureBody();
+
+    await tasks.createTask("list_123", {
+      name: "New Task",
+      custom_fields: [
+        {
+          id: "f1",
+          type: "date",
+          value: 1704067200000,
+          value_options: { time: true },
+        },
+      ],
+    });
+
+    const body = JSON.parse(captured.body);
+    expect(body.custom_fields).toEqual([
+      { id: "f1", value: 1704067200000, value_options: { time: true } },
+    ]);
+  });
+
+  it("should still send other fields and omit custom_fields when not given", async () => {
+    const captured = captureBody();
+
+    await tasks.createTask("list_123", {
+      name: "New Task",
+      description: "Desc",
+    });
+
+    const body = JSON.parse(captured.body);
+    expect(body.name).toBe("New Task");
+    expect(body.description).toBe("Desc");
+    expect(body).not.toHaveProperty("custom_fields");
+  });
+
+  it("should send an empty array for empty custom_fields", async () => {
+    const captured = captureBody();
+
+    await tasks.createTask("list_123", { name: "New Task", custom_fields: [] });
+
+    expect(JSON.parse(captured.body).custom_fields).toEqual([]);
+  });
+});
+
+describe("Tasks - custom_fields query param", () => {
+  const config: ClickUpConfig = { apiToken: "test_token_123" };
+  const tasks = new Tasks(config);
+  const filter = JSON.stringify([
+    { field_id: "f1", operator: "=", value: "abc" },
+  ]);
+
+  const captureUrl = () => {
+    const captured = { url: "" };
+    globalThis.fetch = async (url: RequestInfo | URL) => {
+      captured.url = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({ tasks: [] }),
+      } as Response;
+    };
+    return captured;
+  };
+
+  it("getTask should send custom_fields when provided", async () => {
+    const captured = captureUrl();
+    await tasks.getTask("task_123", { custom_fields: filter });
+    expect(new URL(captured.url).searchParams.get("custom_fields")).toBe(
+      filter,
+    );
+  });
+
+  it("getTask should omit custom_fields when not provided", async () => {
+    const captured = captureUrl();
+    await tasks.getTask("task_123");
+    expect(new URL(captured.url).searchParams.has("custom_fields")).toBe(false);
+  });
+
+  it("getTasks should send custom_fields when provided", async () => {
+    const captured = captureUrl();
+    await tasks.getTasks("list_123", { custom_fields: filter });
+    expect(new URL(captured.url).searchParams.get("custom_fields")).toBe(
+      filter,
+    );
+  });
+
+  it("getTasks should omit custom_fields when not provided", async () => {
+    const captured = captureUrl();
+    await tasks.getTasks("list_123");
+    expect(new URL(captured.url).searchParams.has("custom_fields")).toBe(false);
+  });
+
+  it("getFilteredTeamTasks should send custom_fields when provided", async () => {
+    const captured = captureUrl();
+    await tasks.getFilteredTeamTasks("team_123", { custom_fields: filter });
+    expect(new URL(captured.url).searchParams.get("custom_fields")).toBe(
+      filter,
+    );
+  });
+
+  it("getFilteredTeamTasks should omit custom_fields when not provided", async () => {
+    const captured = captureUrl();
+    await tasks.getFilteredTeamTasks("team_123");
+    expect(new URL(captured.url).searchParams.has("custom_fields")).toBe(false);
   });
 });

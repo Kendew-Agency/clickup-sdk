@@ -623,14 +623,92 @@ const workspaceFields = await clickup.customFields.getWorkspaceCustomFields(
   "team_id",
 );
 
-// Set a custom field value on a task
+// Set a custom field value on a task. `type` selects which `value` shape is
+// accepted, so a mismatch is a compile error. `type` is not sent to the API.
 await clickup.customFields.setCustomFieldValue("task_id", "field_id", {
+  type: "short_text",
   value: "custom value",
+});
+
+// Date: Unix time in milliseconds. Set `value_options.time` to keep the time.
+await clickup.customFields.setCustomFieldValue("task_id", "date_field_id", {
+  type: "date",
+  value: 1767225600000,
+  value_options: { time: true },
+});
+
+// Users, tasks and relationship fields take ids to add and remove
+await clickup.customFields.setCustomFieldValue("task_id", "users_field_id", {
+  type: "users",
+  value: { add: [123], rem: [456] },
+});
+
+// With a custom task ID
+await clickup.customFields.setCustomFieldValue("CUSTOM-123", "field_id", {
+  type: "number",
+  value: 5,
+  custom_task_ids: true,
+  team_id: 1234567,
 });
 
 // Remove a custom field value from a task
 await clickup.customFields.removeCustomFieldValue("task_id", "field_id");
 ```
+
+Supported `type` values: `url`, `drop_down`, `labels`, `email`, `phone`, `date`,
+`short_text`, `text`, `long_text` (deprecated, use `text`), `checkbox`,
+`number`, `currency`, `tasks`, `relationship`, `users`, `emoji`,
+`manual_progress` and `location`. `automatic_progress` fields are read-only and
+cannot be set. Import `CustomFieldValueInput` for the full union.
+
+#### Set custom fields when creating a task
+
+```typescript
+await clickup.tasks.createTask("list_id", {
+  name: "Task with custom fields",
+  custom_fields: [
+    { id: "field_id", type: "short_text", value: "custom value" },
+    { id: "number_field_id", type: "number", value: 5 },
+  ],
+});
+```
+
+#### Read a custom field value
+
+```typescript
+import { retrieveCustomFieldValue } from "@kendew-agency/clickup-sdk";
+
+const result = await clickup.tasks.getTask("task_id");
+
+if (result.data) {
+  const field = retrieveCustomFieldValue(result.data.custom_fields, "field_id");
+  console.log(field?.value);
+}
+```
+
+#### Filter tasks by custom fields
+
+Use the `cf` builders to create typed filters and `serializeCustomFieldFilters`
+to turn them into the `custom_fields` query parameter:
+
+```typescript
+import { cf, serializeCustomFieldFilters } from "@kendew-agency/clickup-sdk";
+
+const tasks = await clickup.tasks.getFilteredTeamTasks("team_id", {
+  custom_fields: serializeCustomFieldFilters([
+    cf.eq("text_field_id", "foo"), // fuzzy match for text fields
+    cf.exact("text_field_id", "foo bar"), // exact match
+    cf.gt("number_field_id", 10),
+    cf.range("number_field_id", 1, 10),
+    cf.any("labels_field_id", ["option_id_1", "option_id_2"]),
+    cf.isNotNull("date_field_id"),
+  ]),
+});
+```
+
+Available builders: `eq`, `exact`, `neq`, `notExact`, `lt`, `lte`, `gt`, `gte`,
+`range`, `any`, `all`, `notAny`, `notAll`, `isNull` and `isNotNull`. The same
+`custom_fields` string is accepted by `getTask` and `getTasks`.
 
 ## Pagination
 
@@ -667,11 +745,12 @@ The SDK uses a `Response<T>` type that includes error information:
 ```typescript
 const result = await clickup.tasks.getTask("task_id");
 
-if ("err" in result) {
-  console.error("Error:", result.err);
-  console.error("Error code:", result.ECODE);
+if (result.error) {
+  console.error("Error:", result.error.message);
+  console.error("Status code:", result.error.statusCode);
+  console.error("Error name:", result.error.name);
 } else {
-  console.log("Task:", result);
+  console.log("Task:", result.data);
 }
 ```
 
@@ -694,6 +773,8 @@ import type {
   ImageData,
   CommentTextAttributes,
   CommentBlockAttributes,
+  CustomFieldValueInput,
+  CustomFieldFilter,
 } from "@kendew-agency/clickup-sdk";
 ```
 

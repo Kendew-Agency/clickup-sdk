@@ -1,6 +1,6 @@
 {
 	"name": "@kendew-agency/clickup-sdk",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"description": "Node.js library for the ClickUp API",
 	"main": "./dist/index.js",
 	"module": "./dist/index.js",
@@ -24,7 +24,7 @@
 		"lint": "biome check .",
 		"lint:fix": "biome check --write .",
 		"format": "biome format --write .",
-		"typecheck": "tsc --noEmit",
+		"typecheck": "tsc --noEmit -p tsconfig.typecheck.json",
 		"prebuild": "pnpm clean",
 		"prepublishOnly": "pnpm build",
 		"test": "vitest run",

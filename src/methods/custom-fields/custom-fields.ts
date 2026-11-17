@@ -1,3 +1,4 @@
+import { toCustomFieldBody } from "../../utils/custom-fields";
 import { Base } from "../base";
 import type {
   GetFolderCustomFieldsResponse,
@@ -94,10 +95,7 @@ export class CustomFields extends Base {
         custom_task_ids: params.custom_task_ids,
         team_id: params.team_id,
       },
-      body: {
-        value: params.value,
-        value_options: params.value_options,
-      },
+      body: toCustomFieldBody(params),
     });
   }
 

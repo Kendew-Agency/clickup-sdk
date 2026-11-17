@@ -358,6 +358,7 @@ describe("CustomFields - setCustomFieldValue", () => {
     };
 
     await customFields.setCustomFieldValue("task_123", "field_456", {
+      type: "drop_down",
       value: "high",
     });
 
@@ -381,6 +382,7 @@ describe("CustomFields - setCustomFieldValue", () => {
     };
 
     await customFields.setCustomFieldValue("task_123", "field_456", {
+      type: "drop_down",
       value: "high",
     });
 
@@ -402,6 +404,7 @@ describe("CustomFields - setCustomFieldValue", () => {
     };
 
     await customFields.setCustomFieldValue("task_123", "field_456", {
+      type: "date",
       value: 1704067200000,
       value_options: { time: true },
     });
@@ -423,6 +426,7 @@ describe("CustomFields - setCustomFieldValue", () => {
     };
 
     await customFields.setCustomFieldValue("task_123", "field_456", {
+      type: "drop_down",
       value: "high",
       custom_task_ids: true,
       team_id: 789,
@@ -443,7 +447,7 @@ describe("CustomFields - setCustomFieldValue", () => {
     const result = await customFields.setCustomFieldValue(
       "task_123",
       "field_456",
-      { value: "high" },
+      { type: "drop_down", value: "high" },
     );
 
     expect(result.data).toEqual({});
@@ -462,12 +466,104 @@ describe("CustomFields - setCustomFieldValue", () => {
     const result = await customFields.setCustomFieldValue(
       "task_123",
       "field_999",
-      { value: "high" },
+      { type: "drop_down", value: "high" },
     );
 
     expect(result.data).toBeNull();
     expect(result.error).not.toBeNull();
     expect(result.error?.statusCode).toBe(400);
+  });
+
+  it("should not send type in the request body", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: string | URL | Request,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await customFields.setCustomFieldValue("task_123", "field_456", {
+      type: "short_text",
+      value: "hello",
+    });
+
+    expect(JSON.parse(capturedBody)).toEqual({ value: "hello" });
+  });
+
+  it("should not send query params or value_options when omitted", async () => {
+    let capturedUrl = "";
+    let capturedBody = "";
+    globalThis.fetch = async (
+      url: string | URL | Request,
+      options?: RequestInit,
+    ) => {
+      capturedUrl = url.toString();
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await customFields.setCustomFieldValue("task_123", "field_456", {
+      type: "checkbox",
+      value: false,
+    });
+
+    expect(capturedUrl).not.toContain("?");
+    expect(JSON.parse(capturedBody)).toEqual({ value: false });
+  });
+
+  it("should include only custom_task_ids when team_id is omitted", async () => {
+    let capturedUrl = "";
+    globalThis.fetch = async (url: string | URL | Request) => {
+      capturedUrl = url.toString();
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await customFields.setCustomFieldValue("task_123", "field_456", {
+      type: "number",
+      value: 5,
+      custom_task_ids: true,
+    });
+
+    expect(capturedUrl).toContain("custom_task_ids=true");
+    expect(capturedUrl).not.toContain("team_id");
+  });
+
+  it("should send add/rem object values unchanged", async () => {
+    let capturedBody = "";
+    globalThis.fetch = async (
+      _url: string | URL | Request,
+      options?: RequestInit,
+    ) => {
+      capturedBody = options?.body as string;
+      return {
+        ok: true,
+        status: 200,
+        text: async () => JSON.stringify({}),
+      } as Response;
+    };
+
+    await customFields.setCustomFieldValue("task_123", "field_456", {
+      type: "users",
+      value: { add: ["1"], rem: ["2"] },
+    });
+
+    expect(JSON.parse(capturedBody)).toEqual({
+      value: { add: ["1"], rem: ["2"] },
+    });
   });
 });
 
